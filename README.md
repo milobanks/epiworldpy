@@ -1,9 +1,9 @@
 # epiworldpy: Python bindings for epiworld
 
-| CI           | status                                                                                                                                                                             |
-|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| conda.recipe | [![Conda Actions Status](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/conda.yml/badge.svg)](https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3AConda) |
-| pip builds   | [![Pip Actions Status](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yml/badge.svg)](https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3APip)       |
+| CI           | status                                                                                                                                                                                                               |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| conda.recipe | [![Conda Actions Status](https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions/workflows/conda.yml/badge.svg)](https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions?query=workflow%3AConda) |
+| pip builds   | [![Pip Actions Status](https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions/workflows/pip.yml/badge.svg)](https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions?query=workflow%3APip)       |
 
 This is a python wrapper of the [`epiworld c++`
 library](https://github.com/UofUEpiBio/epiworld), an ABM simulation
@@ -76,7 +76,7 @@ covid19.print(False)
      - Prob. Recovery       : 0.1400
      - Prob. Transmission   : 0.1000
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10649c570>
+    <epiworldpy._core.ModelSEIRCONN at 0x1064dd570>
 
 And run it and see what we get
 
@@ -99,8 +99,8 @@ covid19.print(False)
     Number of entities  : 0
     Days (duration)     : 100 (of 100)
     Number of viruses   : 1
-    Last run elapsed t  : 50.00ms
-    Last run speed      : 19.66 million agents x day / second
+    Last run elapsed t  : 52.00ms
+    Last run speed      : 19.10 million agents x day / second
     Rewiring            : off
 
     Global actions:
@@ -130,6 +130,6 @@ covid19.print(False)
      - Infected     0.00  0.00  0.86  0.14
      - Recovered    0.00  0.00  0.00  1.00
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10649c570>
+    <epiworldpy._core.ModelSEIRCONN at 0x1064dd570>
 
 # Acknowledgements

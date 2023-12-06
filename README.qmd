@@ -23,13 +23,13 @@ The `epiworld` module is already
 [epiworld-git]: https://github.com/UofUEpiBio/epiworld
 [gitter-badge]:            https://badges.gitter.im/pybind/Lobby.svg
 [gitter-link]:             https://gitter.im/pybind/Lobby
-[actions-badge]:           https://github.com/UofUEpiBio/epiworldpy/workflows/Tests/badge.svg
-[actions-conda-link]:      https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3AConda
-[actions-conda-badge]:     https://github.com/UofUEpiBio/epiworldpy/actions/workflows/conda.yml/badge.svg
-[actions-pip-link]:        https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3APip
-[actions-pip-badge]:       https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yml/badge.svg
-[actions-wheels-link]:     https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3AWheels
-[actions-wheels-badge]:    https://github.com/UofUEpiBio/epiworldpy/workflows/Wheels/badge.svg
+[actions-badge]:           https://github.boozallencsn.com/VegaYon-George/epiworldpy/workflows/Tests/badge.svg
+[actions-conda-link]:      https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions?query=workflow%3AConda
+[actions-conda-badge]:     https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions/workflows/conda.yml/badge.svg
+[actions-pip-link]:        https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions?query=workflow%3APip
+[actions-pip-badge]:       https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions/workflows/pip.yml/badge.svg
+[actions-wheels-link]:     https://github.boozallencsn.com/VegaYon-George/epiworldpy/actions?query=workflow%3AWheels
+[actions-wheels-badge]:    https://github.boozallencsn.com/VegaYon-George/epiworldpy/workflows/Wheels/badge.svg
 
 # Installation
 
