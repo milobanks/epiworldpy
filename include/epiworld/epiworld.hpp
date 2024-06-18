@@ -16,6 +16,15 @@
 #ifndef EPIWORLD_HPP
 #define EPIWORLD_HPP
 
+/* Versioning */
+#define EPIWORLD_VERSION_MAJOR 0
+#define EPIWORLD_VERSION_MINOR 3
+#define EPIWORLD_VERSION_PATCH 0
+
+static const int epiworld_version_major = EPIWORLD_VERSION_MAJOR;
+static const int epiworld_version_minor = EPIWORLD_VERSION_MINOR;
+static const int epiworld_version_patch = EPIWORLD_VERSION_PATCH;
+
 namespace epiworld {
 
     #include "config.hpp"
@@ -42,8 +51,8 @@ namespace epiworld {
 
     #include "queue-bones.hpp"
 
-    #include "globalactions-bones.hpp"
-    #include "globalactions-meat.hpp"
+    #include "globalevent-bones.hpp"
+    #include "globalevent-meat.hpp"
 
     #include "model-bones.hpp"
     #include "model-meat.hpp"
@@ -68,6 +77,9 @@ namespace epiworld {
     #include "agent-meat.hpp"
 
     #include "agentssample-bones.hpp"
+
+    #include "groupsampler-bones.hpp"
+    #include "groupsampler-meat.hpp"
 
     #include "models/models.hpp"
 

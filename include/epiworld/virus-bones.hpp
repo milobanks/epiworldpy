@@ -25,8 +25,8 @@ class Virus {
     friend class Agent<TSeq>;
     friend class Model<TSeq>;
     friend class DataBase<TSeq>;
-    friend void default_add_virus<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
-    friend void default_rm_virus<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
+    friend void default_add_virus<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
+    friend void default_rm_virus<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
 private:
     
     Agent<TSeq> * agent       = nullptr;
@@ -54,8 +54,18 @@ private:
     epiworld_fast_int queue_post    = -Queue<TSeq>::Everyone; ///< Change of state when removed from agent.
     epiworld_fast_int queue_removed = -99; ///< Change of state when agent is removed
 
+    // Information about how distribution works
+    epiworld_double prevalence = 0.0;
+    bool prevalence_as_proportion = false;
+    VirusToAgentFun<TSeq> dist_fun = nullptr;
+
 public:
-    Virus(std::string name = "unknown virus");
+    Virus(
+        std::string name = "unknown virus",
+        epiworld_double prevalence = 0.0,
+        bool prevalence_as_proportion = false,
+        VirusToAgentFun<TSeq> dist_fun = nullptr
+        );
 
     void mutate(Model<TSeq> * model);
     void set_mutation(MutFun<TSeq> fun);
@@ -155,6 +165,18 @@ public:
     bool operator!=(const Virus<TSeq> & other) const {return !operator==(other);};
 
     void print() const;
+
+    /**
+     * @brief Get information about the prevalence of the virus
+     */
+    ///@{
+    epiworld_double get_prevalence() const;
+    void set_prevalence(epiworld_double prevalence, bool as_proportion);
+    bool get_prevalence_as_proportion() const;
+    void distribute(Model<TSeq> * model);
+    void set_dist_fun(VirusToAgentFun<TSeq> fun);
+    ///@}
+
 
 };
 
