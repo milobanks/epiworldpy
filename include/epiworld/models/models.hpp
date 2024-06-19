@@ -5,7 +5,7 @@ namespace epimodels {
 
     #include "init-functions.hpp"
 
-    #include "globalactions.hpp"
+    #include "globalevents.hpp"
     #include "sis.hpp"
     #include "sir.hpp"
     #include "seir.hpp"
@@ -19,6 +19,8 @@ namespace epimodels {
     #include "seirdconnected.hpp"
     #include "sirlogit.hpp"
     #include "diffnet.hpp"
+    #include "seirmixing.hpp"
+    #include "sirmixing.hpp"
 
 
 }

@@ -28,10 +28,10 @@ template<typename TSeq>
 class Queue;
 
 template<typename TSeq>
-struct Action;
+struct Event;
 
 template<typename TSeq>
-class GlobalAction;
+class GlobalEvent;
 
 template<typename TSeq>
 inline epiworld_double susceptibility_reduction_mixer_default(
@@ -135,14 +135,7 @@ protected:
     bool directed = false;
     
     std::vector< VirusPtr<TSeq> > viruses = {};
-    std::vector< epiworld_double > prevalence_virus = {}; ///< Initial prevalence_virus of each virus
-    std::vector< bool > prevalence_virus_as_proportion = {};
-    std::vector< VirusToAgentFun<TSeq> > viruses_dist_funs = {};
-    
     std::vector< ToolPtr<TSeq> > tools = {};
-    std::vector< epiworld_double > prevalence_tool = {};
-    std::vector< bool > prevalence_tool_as_proportion = {};
-    std::vector< ToolToAgentFun<TSeq> > tools_dist_funs = {};
 
     std::vector< Entity<TSeq> > entities = {}; 
     std::vector< Entity<TSeq> > entities_backup = {};
@@ -183,7 +176,7 @@ protected:
 
     void dist_tools();
     void dist_virus();
-    // void dist_entities();
+    void dist_entities();
 
     std::chrono::time_point<std::chrono::steady_clock> time_start;
     std::chrono::time_point<std::chrono::steady_clock> time_end;
@@ -195,20 +188,20 @@ protected:
     void chrono_start();
     void chrono_end();
 
-    std::vector<GlobalAction<TSeq>> global_actions;
+    std::vector<GlobalEvent<TSeq>> globalevents;
 
     Queue<TSeq> queue;
     bool use_queuing   = true;
 
     /**
-     * @brief Variables used to keep track of the actions
+     * @brief Variables used to keep track of the events
      * to be made regarding viruses.
      */
-    std::vector< Action<TSeq> > actions = {};
+    std::vector< Event<TSeq> > events = {};
     epiworld_fast_uint nactions = 0u;
 
     /**
-     * @brief Construct a new Action object
+     * @brief Construct a new Event object
      * 
      * @param agent_ Agent over which the action will be called
      * @param virus_ Virus pointer included in the action
@@ -220,7 +213,7 @@ protected:
      * @param idx_agent_ Location of agent in object.
      * @param idx_object_ Location of object in agent.
      */
-    void actions_add(
+    void events_add(
         Agent<TSeq> * agent_,
         VirusPtr<TSeq> virus_,
         ToolPtr<TSeq> tool_,
@@ -258,6 +251,7 @@ public:
     
     std::vector<epiworld_double> array_double_tmp;
     std::vector<Virus<TSeq> * > array_virus_tmp;
+    std::vector< int > array_int_tmp;
 
     Model();
     Model(const Model<TSeq> & m);
@@ -337,16 +331,12 @@ public:
      * indicating number of individuals.
      */
     ///@{
-    void add_virus(Virus<TSeq> & v, epiworld_double preval);
-    void add_virus_n(Virus<TSeq> & v, epiworld_fast_uint preval);
-    void add_virus_fun(Virus<TSeq> & v, VirusToAgentFun<TSeq> fun);
-    void add_tool(Tool<TSeq> & t, epiworld_double preval);
-    void add_tool_n(Tool<TSeq> & t, epiworld_fast_uint preval);
-    void add_tool_fun(Tool<TSeq> & t, ToolToAgentFun<TSeq> fun);
+    void add_virus(Virus<TSeq> & v);
+    void add_tool(Tool<TSeq> & t);
     void add_entity(Entity<TSeq> e);
     void rm_virus(size_t virus_pos);
     void rm_tool(size_t tool_pos);
-    void rm_entity(size_t entity_pos);
+    void rm_entity(size_t entity_id);
     ///@}
 
     /**
@@ -360,6 +350,20 @@ public:
      * @param skip How many rows to skip.
      */
     void load_agents_entities_ties(std::string fn, int skip);
+    
+    /**
+     * @brief Associate agents-entities from data
+    */
+    void load_agents_entities_ties(
+        const std::vector<int> & agents_ids,
+        const std::vector<int> & entities_ids
+        );
+
+    void load_agents_entities_ties(
+        const int * agents_id,
+        const int * entities_id,
+        size_t n
+        );
 
     /**
      * @name Accessing population of the model
@@ -391,6 +395,8 @@ public:
 
     std::vector< Agent<TSeq> > & get_agents(); ///< Returns a reference to the vector of agents.
 
+    Agent<TSeq> & get_agent(size_t i);
+
     std::vector< epiworld_fast_uint > get_agents_states() const; ///< Returns a vector with the states of the agents.
 
     std::vector< Viruses_const<TSeq> > get_agents_viruses() const; ///< Returns a const vector with the viruses of the agents.
@@ -398,6 +404,8 @@ public:
     std::vector< Viruses<TSeq> > get_agents_viruses(); ///< Returns a vector with the viruses of the agents.
 
     std::vector< Entity<TSeq> > & get_entities();
+
+    Entity<TSeq> & get_entity(size_t entity_id, int * entity_pos = nullptr);
 
     Model<TSeq> & agents_smallworld(
         epiworld_fast_uint n = 1000,
@@ -637,23 +645,23 @@ public:
      * at the end of every day. Otherwise, the function will be called only
      * at the end of the indicated date.
      */
-    void add_global_action(
+    void add_globalevent(
         std::function<void(Model<TSeq>*)> fun,
         std::string name = "A global action",
         int date = -99
         );
 
-    void add_global_action(
-        GlobalAction<TSeq> action
+    void add_globalevent(
+        GlobalEvent<TSeq> action
     );
 
-    GlobalAction<TSeq> & get_global_action(std::string name); ///< Retrieve a global action by name
-    GlobalAction<TSeq> & get_global_action(size_t i); ///< Retrieve a global action by index
+    GlobalEvent<TSeq> & get_globalevent(std::string name); ///< Retrieve a global action by name
+    GlobalEvent<TSeq> & get_globalevent(size_t i); ///< Retrieve a global action by index
 
-    void rm_global_action(std::string name); ///< Remove a global action by name
-    void rm_global_action(size_t i); ///< Remove a global action by index
+    void rm_globalevent(std::string name); ///< Remove a global action by name
+    void rm_globalevent(size_t i); ///< Remove a global action by index
 
-    void run_global_actions();
+    void run_globalevents();
 
     void clear_state_set();
 
@@ -685,8 +693,6 @@ public:
     ///@}
 
     const std::vector< VirusPtr<TSeq> > & get_viruses() const;
-    const std::vector< epiworld_double > & get_prevalence_virus() const;
-    const std::vector< bool > & get_prevalence_virus_as_proportion() const;
     const std::vector< ToolPtr<TSeq> > & get_tools() const;
     Virus<TSeq> & get_virus(size_t id);
     Tool<TSeq> & get_tool(size_t id);
@@ -722,7 +728,7 @@ public:
      * 
      * @param model_ Model over which it will be executed.
      */
-    void actions_run();
+    void events_run();
 
 
 };

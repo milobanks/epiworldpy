@@ -26,7 +26,7 @@ template<typename TSeq>
 class Queue;
 
 template<typename TSeq>
-struct Action;
+struct Event;
 
 template<typename TSeq>
 class Entity;
@@ -35,25 +35,25 @@ template<typename TSeq>
 class Entities;
 
 template<typename TSeq>
-inline void default_add_virus(Action<TSeq> & a, Model<TSeq> * m);
+inline void default_add_virus(Event<TSeq> & a, Model<TSeq> * m);
 
 template<typename TSeq>
-inline void default_add_tool(Action<TSeq> & a, Model<TSeq> * m);
+inline void default_add_tool(Event<TSeq> & a, Model<TSeq> * m);
 
 template<typename TSeq>
-inline void default_add_entity(Action<TSeq> & a, Model<TSeq> * m);
+inline void default_add_entity(Event<TSeq> & a, Model<TSeq> * m);
 
 template<typename TSeq>
-inline void default_rm_virus(Action<TSeq> & a, Model<TSeq> * m);
+inline void default_rm_virus(Event<TSeq> & a, Model<TSeq> * m);
 
 template<typename TSeq>
-inline void default_rm_tool(Action<TSeq> & a, Model<TSeq> * m);
+inline void default_rm_tool(Event<TSeq> & a, Model<TSeq> * m);
 
 template<typename TSeq>
-inline void default_rm_entity(Action<TSeq> & a, Model<TSeq> * m);
+inline void default_rm_entity(Event<TSeq> & a, Model<TSeq> * m);
 
 template<typename TSeq>
-inline void default_change_state(Action<TSeq> & a, Model<TSeq> * m);
+inline void default_change_state(Event<TSeq> & a, Model<TSeq> * m);
 
 
 
@@ -72,13 +72,13 @@ class Agent {
     friend class Queue<TSeq>;
     friend class Entities<TSeq>;
     friend class AgentsSample<TSeq>;
-    friend void default_add_virus<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
-    friend void default_add_tool<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
-    friend void default_add_entity<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
-    friend void default_rm_virus<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
-    friend void default_rm_tool<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
-    friend void default_rm_entity<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
-    friend void default_change_state<TSeq>(Action<TSeq> & a, Model<TSeq> * m);
+    friend void default_add_virus<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
+    friend void default_add_tool<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
+    friend void default_add_entity<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
+    friend void default_rm_virus<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
+    friend void default_rm_tool<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
+    friend void default_rm_entity<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
+    friend void default_change_state<TSeq>(Event<TSeq> & a, Model<TSeq> * m);
 private:
     
     Model<TSeq> * model;
@@ -102,9 +102,9 @@ private:
     std::vector< ToolPtr<TSeq> > tools;
     epiworld_fast_uint n_tools = 0u;
 
-    std::vector< Agent<TSeq> * > sampled_agents;
+    std::vector< Agent<TSeq> * > sampled_agents = {};
     size_t sampled_agents_n      = 0u;
-    std::vector< size_t > sampled_agents_left;
+    std::vector< size_t > sampled_agents_left = {};
     size_t sampled_agents_left_n = 0u;
     int date_last_build_sample   = -99;
 
@@ -218,6 +218,7 @@ public:
     int get_id() const; ///< Id of the individual
 
     VirusPtr<TSeq> & get_virus();
+    const VirusPtr<TSeq> & get_virus() const;
 
     ToolPtr<TSeq> & get_tool(int i);
     Tools<TSeq> get_tools();

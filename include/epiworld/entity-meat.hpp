@@ -1,6 +1,53 @@
 #ifndef EPIWORLD_ENTITY_MEAT_HPP
 #define EPIWORLD_ENTITY_MEAT_HPP
 
+template <typename TSeq = EPI_DEFAULT_TSEQ>
+EPI_NEW_ENTITYTOAGENTFUN(entity_to_unassigned_agents, TSeq)
+{
+
+    // Preparing the sampling space
+    std::vector< size_t > idx;
+    for (const auto & a: m->get_agents())
+        if (a.get_n_entities() == 0)
+            idx.push_back(a.get_id());
+    size_t n = idx.size();
+
+    // Figuring out how many to sample
+    int n_to_sample;
+    if (e.prevalence_as_proportion)
+    {
+        n_to_sample = static_cast<int>(std::floor(e.prevalence * n));
+        if (n_to_sample > n)
+            --n_to_sample;
+
+    } else
+    {
+        n_to_sample = static_cast<int>(e.prevalence);
+        if (n_to_sample > n)
+            throw std::range_error("There are only " + std::to_string(n) + 
+            " individuals in the population. Cannot add the entity to " +
+                std::to_string(n_to_sample));
+    }
+
+    int n_left = n;
+    for (size_t i = 0u; i < n_to_sample; ++i)
+    {
+        int loc = static_cast<epiworld_fast_uint>(
+            floor(m->runif() * n_left--)
+            );
+
+        // Correcting for possible overflow
+        if ((loc > 0) && (loc >= n_left))
+            loc = n_left - 1;
+
+        m->get_agent(idx[loc]).add_entity(e, m);
+
+        std::swap(idx[loc], idx[n_left]);
+
+    }
+
+}
+
 template<typename TSeq>
 inline void Entity<TSeq>::add_agent(
     Agent<TSeq> & p,
@@ -8,7 +55,7 @@ inline void Entity<TSeq>::add_agent(
     )
 {
 
-    // Need to add it to the actions, through the individual
+    // Need to add it to the events, through the individual
     p.add_entity(*this, model);    
 
 }
@@ -31,7 +78,7 @@ inline void Entity<TSeq>::rm_agent(size_t idx)
             " out of " + std::to_string(n_agents)
             );
 
-    model->population[idx].rm_entity(*this);
+    model->get_agents()[agents[idx]].rm_entity(*this, model);
 
     return;
 }
@@ -92,7 +139,10 @@ template<typename TSeq>
 inline Agent<TSeq> * Entity<TSeq>::operator[](size_t i)
 {
     if (n_agents <= i)
-        throw std::logic_error("There are not that many agents in this entity.");
+        throw std::logic_error(
+            "There are not that many agents in this entity. " +
+            std::to_string(n_agents) + " <= " + std::to_string(i)
+            );
 
     return &model->get_agents()[i];
 }
@@ -164,6 +214,13 @@ inline void Entity<TSeq>::reset()
     sampled_agents_n = 0u;
     sampled_agents_left.clear();
     sampled_agents_left_n = 0u;
+
+    // Removing agents from entities
+    for (size_t i = 0u; i < n_agents; ++i)
+        this->rm_agent(i);
+
+    return;
+
 }
 
 template<typename TSeq>
@@ -214,6 +271,78 @@ inline bool Entity<TSeq>::operator==(const Entity<TSeq> & other) const
 
     return true;
 
+}
+
+template<typename TSeq>
+inline void Entity<TSeq>::distribute()
+{
+
+    // Starting first infection
+    int n = this->model->size();
+    std::vector< size_t > idx(n);
+
+    if (dist_fun)
+    {
+
+        dist_fun(*this, model);
+
+    }
+    else
+    {
+
+        // Picking how many
+        int nsampled;
+        if (prevalence_as_proportion)
+        {
+            nsampled = static_cast<int>(std::floor(prevalence * size()));
+        }
+        else
+        {
+            nsampled = static_cast<int>(prevalence);
+        }
+
+        if (nsampled > static_cast<int>(model->size()))
+            throw std::range_error("There are only " + std::to_string(model->size()) + 
+            " individuals in the population. Cannot add the entity to " + std::to_string(nsampled));
+        
+        int n_left = n;
+        std::iota(idx.begin(), idx.end(), 0);
+        while (nsampled > 0)
+        {
+            int loc = static_cast<epiworld_fast_uint>(
+                floor(model->runif() * n_left--)
+                );
+            
+            model->get_agent(idx[loc]).add_entity(
+                *this, this->model, this->state_init, this->queue_init
+                );
+            
+            nsampled--;
+
+            std::swap(idx[loc], idx[n_left]);
+
+        }
+
+    }
+
+}
+
+template<typename TSeq>
+inline std::vector< size_t > & Entity<TSeq>::get_agents()
+{
+    return agents;
+}
+
+template<typename TSeq>
+inline void Entity<TSeq>::print() const
+{
+
+    printf_epiworld(
+        "Entity '%s' (id %i) with %i agents.\n",
+        this->entity_name.c_str(),
+        static_cast<int>(id),
+        static_cast<int>(n_agents)
+    );
 }
 
 #endif
