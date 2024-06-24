@@ -14,40 +14,26 @@ This is a python wrapper of the [`epiworld c++` library][epiworld-git], an ABM
 simulation engine. This is possible using the
 [`pybind11`][] library (which rocks!).
 
-[`pybind11`]: https://pybind11.readthedocs.io/en/stable/
-
 The `epiworld` module is already
 [implemented in R](https://github.com/UofUEpiBio/epiworldR){target="_blank"}.
 
-
-[epiworld-git]: https://github.com/UofUEpiBio/epiworld
-[gitter-badge]:            https://badges.gitter.im/pybind/Lobby.svg
-[gitter-link]:             https://gitter.im/pybind/Lobby
-[actions-badge]:           https://github.com/UofUEpiBio/epiworldpy/workflows/Tests/badge.svg
-[actions-conda-link]:      https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3AConda
-[actions-conda-badge]:     https://github.com/UofUEpiBio/epiworldpy/actions/workflows/conda.yml/badge.svg
-[actions-pip-link]:        https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3APip
-[actions-pip-badge]:       https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yml/badge.svg
-[actions-wheels-link]:     https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3AWheels
-[actions-wheels-badge]:    https://github.com/UofUEpiBio/epiworldpy/workflows/Wheels/badge.svg
-
 # Installation
-
 
 - clone this repository
 - `pip install ./epiworldpy`
 
-
 # Examples 
 
-## Base setup
+## Basic
 
 Here we show how to create a `SEIR` object and add terms to it. We will use the following data:
 
 ```{python}
 # Loading the module
-import epiworldpy as m
-covid19 = m.ModelSEIR(
+import epiworldpy as epiworld
+
+# Create a SEIR model (susceptible, exposed, infectious, recovered), representing COVID-19.
+covid19 = epiworld.ModelSEIR(
   name              = 'covid-19',
   n                 = 10000,
   prevalence        = .01,
@@ -57,24 +43,60 @@ covid19 = m.ModelSEIR(
   recovery_rate     = 0.14
 )
 
-```
-
-We can now take a look at the model
-
-```{python}
-# Creating the object
+# Taking a look
 covid19.print(False)
 ```
 
-And run it and see what we get
+Let's run it and to see what we get:
 
 ```{python}
+# Run for 100 days with a seed of 223.
 covid19.run(100, 223)
+
+# Print an overview.
 covid19.print(False)
 ```
 
-[`cibuildwheel`]:          https://cibuildwheel.readthedocs.io
+We can know visualize the resulting time series:
 
+```{python}
+#| label: series-visualization
+#| fig-cap: "The data resulting from the COVID-19 SEIR model run"
 
-# Acknowledgements
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Get the data from the database
+history = covid19.getDb().getHistTotal()
+
+# Extract unique states and dates
+unique_states = np.unique(history['states'])
+unique_dates = np.unique(history['dates'])
+
+# Initialize a dictionary to store time series data for each state
+time_series_data = {state: [] for state in unique_states}
+
+# Populate the time series data for each state
+for state in unique_states:
+  for date in unique_dates:
+    # Get the count for the current state and date
+    mask = (history['states'] == state) & (history['dates'] == date)
+    count = history['counts'][mask][0]
+    time_series_data[state].append(count)
+
+# Start the plotting!
+plt.figure(figsize=(10, 6))
+
+for state in unique_states:
+  plt.plot(unique_dates, time_series_data[state], marker='o', label=state)
+
+plt.xlabel('Day')
+plt.ylabel('Count')
+plt.yscale('log')
+plt.title('COVID-19 SEIR Model Data')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+[`pybind11`]: https://pybind11.readthedocs.io/en/stable/

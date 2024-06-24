@@ -62,8 +62,8 @@ covid19.print(False)
     Last run elapsed t  : -
     Rewiring            : off
 
-    Global actions:
-     (none)
+    Global events:
+     - Update infected individuals (runs daily)
 
     Virus(es):
      - covid-19 (baseline prevalence: 1.00%)
@@ -77,7 +77,7 @@ covid19.print(False)
      - Prob. Recovery       : 0.1400
      - Prob. Transmission   : 0.1000
 
-    <epiworldpy._core.ModelSEIRCONN at 0x7fe01a91bcb0>
+    <epiworldpy._core.ModelSEIRCONN at 0x10899ebb0>
 
 And run it and see what we get
 
@@ -100,12 +100,12 @@ covid19.print(False)
     Number of entities  : 0
     Days (duration)     : 100 (of 100)
     Number of viruses   : 1
-    Last run elapsed t  : 105.00ms
-    Last run speed      : 9.47 million agents x day / second
+    Last run elapsed t  : 14.00ms
+    Last run speed      : 71.15 million agents x day / second
     Rewiring            : off
 
-    Global actions:
-     (none)
+    Global events:
+     - Update infected individuals (runs daily)
 
     Virus(es):
      - covid-19 (baseline prevalence: 1.00%)
@@ -120,17 +120,58 @@ covid19.print(False)
      - Prob. Transmission   : 0.1000
 
     Distribution of the population at time 100:
-      - (0) Susceptible :  9900 -> 8454
-      - (1) Exposed     :   100 -> 140
-      - (2) Infected    :     0 -> 135
-      - (3) Recovered   :     0 -> 1271
+      - (0) Susceptible :  9900 -> 7275
+      - (1) Exposed     :   100 -> 269
+      - (2) Infected    :     0 -> 292
+      - (3) Recovered   :     0 -> 2164
 
     Transition Probabilities:
      - Susceptible  1.00  0.00  0.00  0.00
-     - Exposed      0.00  0.86  0.14  0.00
-     - Infected     0.00  0.00  0.85  0.15
+     - Exposed      0.00  0.85  0.15  0.00
+     - Infected     0.00  0.00  0.86  0.14
      - Recovered    0.00  0.00  0.00  1.00
 
-    <epiworldpy._core.ModelSEIRCONN at 0x7fe01a91bcb0>
+    <epiworldpy._core.ModelSEIRCONN at 0x10899ebb0>
+
+Let’s visualize the resulting time series
+
+``` python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Get the data from the database
+history = covid19.getDb().getHistTotal()
+
+# Extract unique states and dates
+unique_states = np.unique(history['states'])
+unique_dates = np.unique(history['dates'])
+
+# Initialize a dictionary to store time series data for each state
+time_series_data = {state: [] for state in unique_states}
+
+# Populate the time series data for each state
+for state in unique_states:
+  for date in unique_dates:
+    # Get the count for the current state and date
+    mask = (history['states'] == state) & (history['dates'] == date)
+    count = history['counts'][mask][0]
+    time_series_data[state].append(count)
+
+# Start the plotting!
+plt.figure(figsize=(10, 6))
+
+for state in unique_states:
+  plt.plot(unique_dates, time_series_data[state], marker='o', label=state)
+
+plt.xlabel('Time')
+plt.ylabel('Count')
+plt.title('Time Series of States')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+![The data resulting from the COVID-19 SEIR model
+run](README_files/figure-commonmark/series-visualization-output-1.png)
 
 # Acknowledgements
