@@ -11,6 +11,5 @@ def test_seir_simple():
         recovery_rate     = 0.14
     )
 
-    covid19.print(False)
     covid19.run(100, 223)
     
