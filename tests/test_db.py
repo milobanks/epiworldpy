@@ -15,7 +15,7 @@ def test_db_simple():
 
     covid19.run(DAYS, 223)
 
-    history = covid19.getDb().getHistTotal()
+    history = covid19.get_db().get_hist_total()
     dates = history['dates']
     states = history['states']
     counts = history['counts']

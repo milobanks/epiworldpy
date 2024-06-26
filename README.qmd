@@ -67,7 +67,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Get the data from the database
-history = covid19.getDb().getHistTotal()
+history = covid19.get_db().get_hist_total()
 
 # Extract unique states and dates
 unique_states = np.unique(history['states'])

@@ -74,7 +74,7 @@ covid19.print(False)
      - Prob. Recovery       : 0.1400
      - Prob. Transmission   : 0.1000
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10c975130>
+    <epiworldpy._core.ModelSEIRCONN at 0x112bec9f0>
 
 Let’s run it and to see what we get:
 
@@ -100,8 +100,8 @@ covid19.print(False)
     Number of entities  : 0
     Days (duration)     : 100 (of 100)
     Number of viruses   : 1
-    Last run elapsed t  : 13.00ms
-    Last run speed      : 73.00 million agents x day / second
+    Last run elapsed t  : 16.00ms
+    Last run speed      : 61.39 million agents x day / second
     Rewiring            : off
 
     Global events:
@@ -131,7 +131,7 @@ covid19.print(False)
      - Infected     0.00  0.00  0.86  0.14
      - Recovered    0.00  0.00  0.00  1.00
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10c975130>
+    <epiworldpy._core.ModelSEIRCONN at 0x112bec9f0>
 
 We can know visualize the resulting time series:
 
@@ -140,7 +140,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Get the data from the database
-history = covid19.getDb().getHistTotal()
+history = covid19.get_db().get_hist_total()
 
 # Extract unique states and dates
 unique_states = np.unique(history['states'])

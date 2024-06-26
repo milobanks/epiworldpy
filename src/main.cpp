@@ -55,11 +55,11 @@ PYBIND11_MODULE(_core, m) {
 
     // Only this is necessary to expose the class
     py::class_<Model<int>, std::shared_ptr<Model<int>>>(m, "Model")
-        .def("getName", &Model<int>::get_name);
+        .def("get_name", &Model<int>::get_name);
 
     // Only this is necessary to expose the class
     py::class_<DataBase<int>, std::shared_ptr<DataBase<int>>>(m, "DataBase")
-        .def("getHistTotal", [](DataBase<int> &self) {
+        .def("get_hist_total", [](DataBase<int> &self) {
             std::vector<std::string> states;
             std::vector<int> dates;
             std::vector<int> counts;
@@ -96,7 +96,7 @@ PYBIND11_MODULE(_core, m) {
             py::arg("ndays"),
             py::arg("seed") = 1u
             )
-        .def("getDb", [](epimodels::ModelSEIRCONN<int> &self) {
+        .def("get_db", [](epimodels::ModelSEIRCONN<int> &self) {
             //std::cout << "!!! " << self.get_db().get_model()->get_name() << std::endl;
             return std::shared_ptr<DataBase<int>>(&self.get_db(), [](DataBase<int>*){ /* do nothing, no delete */ });
         }, py::return_value_policy::reference);
