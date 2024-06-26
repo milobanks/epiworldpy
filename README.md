@@ -1,16 +1,15 @@
 # epiworldpy: Python bindings for epiworld
 
 
-| CI           | status                                                                                                                                                                             |
-|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| conda.recipe | [![Conda Actions Status](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/conda.yml/badge.svg)](https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3AConda) |
-| pip builds   | [![Pip Actions Status](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yml/badge.svg)](https://github.com/UofUEpiBio/epiworldpy/actions?query=workflow%3APip)       |
+| CI           | status                                                                     |
+|--------------|----------------------------------------------------------------------------|
+| conda.recipe | \[\![Conda Actions Status\]\[actions-conda-badge\]\]\[actions-conda-link\] |
+| pip builds   | \[\![Pip Actions Status\]\[actions-pip-badge\]\]\[actions-pip-link\]       |
 
-This is a python wrapper of the [`epiworld c++`
-library](https://github.com/UofUEpiBio/epiworld), an ABM simulation
-engine. This is possible using the
-[`pybind11`](https://pybind11.readthedocs.io/en/stable/) library (which
-rocks!).
+This is a python wrapper of the \[`epiworld c++`
+library\]\[epiworld-git\], an ABM simulation engine. This is possible
+using the [`pybind11`](https://pybind11.readthedocs.io/en/stable/)
+library (which rocks!).
 
 The `epiworld` module is already
 <a href="https://github.com/UofUEpiBio/epiworldR"
@@ -23,15 +22,17 @@ target="_blank">implemented in R</a>.
 
 # Examples
 
-## Base setup
+## Basic
 
 Here we show how to create a `SEIR` object and add terms to it. We will
 use the following data:
 
 ``` python
 # Loading the module
-import epiworldpy as m
-covid19 = m.ModelSEIR(
+import epiworldpy as epiworld
+
+# Create a SEIR model (susceptible, exposed, infectious, recovered), representing COVID-19.
+covid19 = epiworld.ModelSEIR(
   name              = 'covid-19',
   n                 = 10000,
   prevalence        = .01,
@@ -40,12 +41,8 @@ covid19 = m.ModelSEIR(
   incubation_days   = 7.0,
   recovery_rate     = 0.14
 )
-```
 
-We can now take a look at the model
-
-``` python
-# Creating the object
+# Taking a look
 covid19.print(False)
 ```
 
@@ -77,12 +74,15 @@ covid19.print(False)
      - Prob. Recovery       : 0.1400
      - Prob. Transmission   : 0.1000
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10899ebb0>
+    <epiworldpy._core.ModelSEIRCONN at 0x10c975130>
 
-And run it and see what we get
+Let’s run it and to see what we get:
 
 ``` python
+# Run for 100 days with a seed of 223.
 covid19.run(100, 223)
+
+# Print an overview.
 covid19.print(False)
 ```
 
@@ -100,8 +100,8 @@ covid19.print(False)
     Number of entities  : 0
     Days (duration)     : 100 (of 100)
     Number of viruses   : 1
-    Last run elapsed t  : 14.00ms
-    Last run speed      : 71.15 million agents x day / second
+    Last run elapsed t  : 13.00ms
+    Last run speed      : 73.00 million agents x day / second
     Rewiring            : off
 
     Global events:
@@ -131,9 +131,9 @@ covid19.print(False)
      - Infected     0.00  0.00  0.86  0.14
      - Recovered    0.00  0.00  0.00  1.00
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10899ebb0>
+    <epiworldpy._core.ModelSEIRCONN at 0x10c975130>
 
-Let’s visualize the resulting time series
+We can know visualize the resulting time series:
 
 ``` python
 import numpy as np
@@ -145,6 +145,9 @@ history = covid19.getDb().getHistTotal()
 # Extract unique states and dates
 unique_states = np.unique(history['states'])
 unique_dates = np.unique(history['dates'])
+
+# Remove some data that will mess with scaling
+unique_states = np.delete(unique_states, np.where(unique_states == 'Susceptible'))
 
 # Initialize a dictionary to store time series data for each state
 time_series_data = {state: [] for state in unique_states}
@@ -163,9 +166,9 @@ plt.figure(figsize=(10, 6))
 for state in unique_states:
   plt.plot(unique_dates, time_series_data[state], marker='o', label=state)
 
-plt.xlabel('Time')
+plt.xlabel('Day')
 plt.ylabel('Count')
-plt.title('Time Series of States')
+plt.title('COVID-19 SEIR Model Data')
 plt.legend()
 plt.grid(True)
 plt.show()
@@ -173,5 +176,3 @@ plt.show()
 
 ![The data resulting from the COVID-19 SEIR model
 run](README_files/figure-commonmark/series-visualization-output-1.png)
-
-# Acknowledgements

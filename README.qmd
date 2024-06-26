@@ -73,6 +73,9 @@ history = covid19.getDb().getHistTotal()
 unique_states = np.unique(history['states'])
 unique_dates = np.unique(history['dates'])
 
+# Remove some data that will mess with scaling
+unique_states = np.delete(unique_states, np.where(unique_states == 'Susceptible'))
+
 # Initialize a dictionary to store time series data for each state
 time_series_data = {state: [] for state in unique_states}
 
@@ -92,7 +95,6 @@ for state in unique_states:
 
 plt.xlabel('Day')
 plt.ylabel('Count')
-plt.yscale('log')
 plt.title('COVID-19 SEIR Model Data')
 plt.legend()
 plt.grid(True)
