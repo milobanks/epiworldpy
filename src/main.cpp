@@ -6,6 +6,7 @@
 #include "epiworld-common.hpp"
 
 using namespace epiworld;
+using namespace pybind11::literals;
 
 namespace py = pybind11;
 
@@ -52,7 +53,32 @@ PYBIND11_MODULE(_core, m) {
            ModelSEIR
     )pbdoc";
 
-    // Only this is necesary to expose the class
+    // Only this is necessary to expose the class
+    py::class_<Model<int>, std::shared_ptr<Model<int>>>(m, "Model")
+        .def("get_name", &Model<int>::get_name);
+
+    // Only this is necessary to expose the class
+    py::class_<DataBase<int>, std::shared_ptr<DataBase<int>>>(m, "DataBase")
+        .def("get_hist_total", [](DataBase<int> &self) {
+            std::vector<std::string> states;
+            std::vector<int> dates;
+            std::vector<int> counts;
+
+            self.get_hist_total(&dates, &states, &counts);
+
+            py::array py_states = py::array(py::cast(states));
+            py::array_t<int> py_dates(dates.size(), dates.data());
+            py::array_t<int> py_counts(counts.size(), counts.data());
+
+            py::dict ret(
+                "dates"_a=py_dates,
+                "states"_a=py_states,
+                "counts"_a=py_counts);
+
+            return ret;
+        });
+
+    // Only this is necessary to expose the class
     py::class_<epimodels::ModelSEIRCONN<int>, std::shared_ptr<epimodels::ModelSEIRCONN<int>>>(m, "ModelSEIRCONN")
         // .def(py::init<>())
         .def("print", &epimodels::ModelSEIRCONN<int>::print,
@@ -69,7 +95,11 @@ PYBIND11_MODULE(_core, m) {
         )pbdoc",
             py::arg("ndays"),
             py::arg("seed") = 1u
-            );
+            )
+        .def("get_db", [](epimodels::ModelSEIRCONN<int> &self) {
+            //std::cout << "!!! " << self.get_db().get_model()->get_name() << std::endl;
+            return std::shared_ptr<DataBase<int>>(&self.get_db(), [](DataBase<int>*){ /* do nothing, no delete */ });
+        }, py::return_value_policy::reference);
 
     // Example with shared_ptr
     m.def("ModelSEIR", &ModelSEIR, R"pbdoc(
