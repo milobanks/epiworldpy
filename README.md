@@ -4,10 +4,11 @@
 [![Pip
 Build](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yaml/badge.svg)](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yaml)
 
-This is a python wrapper of the \[`epiworld c++`
-library\]\[epiworld-git\], an ABM simulation engine. This is possible
-using the [`pybind11`](https://pybind11.readthedocs.io/en/stable/)
-library (which rocks!).
+This is a python wrapper of the [`epiworld c++`
+library](https://github.com/UofUEpiBio/epiworld/), an ABM simulation
+engine. This is possible using the
+[`pybind11`](https://pybind11.readthedocs.io/en/stable/) library (which
+rocks!).
 
 The `epiworld` module is already
 <a href="https://github.com/UofUEpiBio/epiworldR"
@@ -72,7 +73,7 @@ covid19.print(False)
      - Prob. Recovery       : 0.1400
      - Prob. Transmission   : 0.1000
 
-    <epiworldpy._core.ModelSEIRCONN at 0x112bec9f0>
+    <epiworldpy._core.ModelSEIRCONN at 0x105d14930>
 
 Let’s run it and to see what we get:
 
@@ -98,8 +99,8 @@ covid19.print(False)
     Number of entities  : 0
     Days (duration)     : 100 (of 100)
     Number of viruses   : 1
-    Last run elapsed t  : 16.00ms
-    Last run speed      : 61.39 million agents x day / second
+    Last run elapsed t  : 13.00ms
+    Last run speed      : 73.78 million agents x day / second
     Rewiring            : off
 
     Global events:
@@ -129,7 +130,7 @@ covid19.print(False)
      - Infected     0.00  0.00  0.86  0.14
      - Recovered    0.00  0.00  0.00  1.00
 
-    <epiworldpy._core.ModelSEIRCONN at 0x112bec9f0>
+    <epiworldpy._core.ModelSEIRCONN at 0x105d14930>
 
 We can know visualize the resulting time series:
 

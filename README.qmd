@@ -97,4 +97,5 @@ plt.grid(True)
 plt.show()
 ```
 
+[epiworld-git]: https://github.com/UofUEpiBio/epiworld/
 [`pybind11`]: https://pybind11.readthedocs.io/en/stable/
