@@ -1,8 +1,10 @@
 import epiworldpy as epiworld
+import pytest
 
-def test_db_simple():
-    DAYS = 100
+DAYS = 100
 
+@pytest.fixture
+def covid19():
     covid19 = epiworld.ModelSEIR(
         name              = 'covid-19',
         n                 = 10000,
@@ -15,6 +17,9 @@ def test_db_simple():
 
     covid19.run(DAYS, 223)
 
+    return covid19
+
+def test_db_simple(covid19):
     history = covid19.get_db().get_hist_total()
     dates = history['dates']
     states = history['states']
@@ -28,3 +33,11 @@ def test_db_simple():
     assert len(dates) == EXPECTED_ENTRIES
     assert len(states) == EXPECTED_ENTRIES
     assert len(counts) == EXPECTED_ENTRIES
+
+def test_db_reproductive_number(covid19):
+    effective_reproductive_data = covid19.get_db().get_reproductive_number()
+
+    assert type(effective_reproductive_data[0][0]) is dict
+
+def test_db_transmissions(covid19):
+    transmissions = covid19.get_db().get_transmissions()
