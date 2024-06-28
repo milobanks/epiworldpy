@@ -41,3 +41,9 @@ def test_db_reproductive_number(covid19):
 
 def test_db_transmissions(covid19):
     transmissions = covid19.get_db().get_transmissions()
+    start = transmissions['source_exposure_dates']
+    end = transmissions['dates']
+    source = transmissions['sources']
+    target = transmissions['targets']
+
+    assert len(start) * len(end) * len(source) * len(target) == len(start) ** 4
