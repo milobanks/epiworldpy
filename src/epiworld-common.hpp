@@ -220,11 +220,23 @@ inline Saver::Saver(
   std::string fn,
   std::string id,
   bool file_output) :
-  fun(epiworld::make_save_run(fn)),
   what(what),
   fn(fn),
   id(id),
-  file_output(file_output) {}
+  file_output(file_output) {
+    fun = epiworld::make_save_run(
+      fn,
+      std::find(what.begin(), what.end(), "total_hist") != what.end(),
+      std::find(what.begin(), what.end(), "virus_info") != what.end(),
+      std::find(what.begin(), what.end(), "virus_hist") != what.end(),
+      std::find(what.begin(), what.end(), "tool_info") != what.end(),
+      std::find(what.begin(), what.end(), "tool_hist") != what.end(),
+      std::find(what.begin(), what.end(), "transmission") != what.end(),
+      std::find(what.begin(), what.end(), "transition") != what.end(),
+      std::find(what.begin(), what.end(), "reproductive") != what.end(),
+      std::find(what.begin(), what.end(), "generation") != what.end()
+    );
+  }
 
 inline void Saver::unlink_siblings() const {
     auto dir = dirname(fn);
