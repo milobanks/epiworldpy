@@ -224,7 +224,7 @@ inline Saver::Saver(
   fn(fn),
   id(id),
   file_output(file_output) {
-    fun = epiworld::make_save_run(
+    fun = epiworld::make_save_run<int>(
       fn,
       std::find(what.begin(), what.end(), "total_hist") != what.end(),
       std::find(what.begin(), what.end(), "virus_info") != what.end(),
