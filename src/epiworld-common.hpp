@@ -72,7 +72,7 @@ inline std::ostream& operator<<(std::ostream &stream, const Saver& data) {
   return stream;
 }
 
-static std::string parse_kwarg_string(const pybind11::kwargs& kwargs, const char* key, const std::string _default) {
+static std::string parse_kwarg_string(const pybind11::kwargs& kwargs, const char* key, const std::string& _default) {
   PyObject* item = PyDict_GetItemString(kwargs.ptr(), key);
 
   if (item != nullptr) {
@@ -156,7 +156,6 @@ static std::vector<std::string> get_files_in_dir(const std::string& directory) {
 
   if (dir == nullptr) {
     throw std::runtime_error(directory + ": " + strerror(errno));
-    return found;
   }
 
   while ((entry = readdir(dir)) != nullptr) {
@@ -215,23 +214,22 @@ inline Saver::Saver(
   std::string fn,
   std::string id,
   bool file_output) :
+  fun(epiworld::make_save_run<int>(
+    fn,
+    std::find(what.begin(), what.end(), "total_hist") != what.end(),
+    std::find(what.begin(), what.end(), "virus_info") != what.end(),
+    std::find(what.begin(), what.end(), "virus_hist") != what.end(),
+    std::find(what.begin(), what.end(), "tool_info") != what.end(),
+    std::find(what.begin(), what.end(), "tool_hist") != what.end(),
+    std::find(what.begin(), what.end(), "transmission") != what.end(),
+    std::find(what.begin(), what.end(), "transition") != what.end(),
+    std::find(what.begin(), what.end(), "reproductive") != what.end(),
+    std::find(what.begin(), what.end(), "generation") != what.end()
+  )),
   what(what),
   fn(fn),
   id(id),
-  file_output(file_output) {
-    fun = epiworld::make_save_run<int>(
-      fn,
-      std::find(what.begin(), what.end(), "total_hist") != what.end(),
-      std::find(what.begin(), what.end(), "virus_info") != what.end(),
-      std::find(what.begin(), what.end(), "virus_hist") != what.end(),
-      std::find(what.begin(), what.end(), "tool_info") != what.end(),
-      std::find(what.begin(), what.end(), "tool_hist") != what.end(),
-      std::find(what.begin(), what.end(), "transmission") != what.end(),
-      std::find(what.begin(), what.end(), "transition") != what.end(),
-      std::find(what.begin(), what.end(), "reproductive") != what.end(),
-      std::find(what.begin(), what.end(), "generation") != what.end()
-    );
-  }
+  file_output(file_output) {}
 
 inline void Saver::unlink_siblings() const {
     auto dir = dirname(fn);
