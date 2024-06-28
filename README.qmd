@@ -168,7 +168,7 @@ plt.grid(True)
 plt.show()
 ```
 
-Epiworld records agent-agent interactions, and we can graph those too. In the below example, we only all cases stemming from an index case.
+Epiworld records agent-agent interactions, and we can graph those too. In the below example, we only track all cases stemming from a specific index case, despite the model having a prevalence of 0.01.
 
 ```{python}
 #| label: contact-visualization

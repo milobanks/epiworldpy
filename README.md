@@ -73,7 +73,7 @@ covid19.print(False)
      - Prob. Recovery       : 0.1400
      - Prob. Transmission   : 0.1000
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10b1c85f0>
+    <epiworldpy._core.ModelSEIRCONN at 0x1058e6e70>
 
 Let’s run it and to see what we get:
 
@@ -99,8 +99,8 @@ covid19.print(False)
     Number of entities  : 0
     Days (duration)     : 100 (of 100)
     Number of viruses   : 1
-    Last run elapsed t  : 13.00ms
-    Last run speed      : 74.44 million agents x day / second
+    Last run elapsed t  : 14.00ms
+    Last run speed      : 70.84 million agents x day / second
     Rewiring            : off
 
     Global events:
@@ -130,7 +130,7 @@ covid19.print(False)
      - Infected     0.00  0.00  0.86  0.14
      - Recovered    0.00  0.00  0.00  1.00
 
-    <epiworldpy._core.ModelSEIRCONN at 0x10b1c85f0>
+    <epiworldpy._core.ModelSEIRCONN at 0x1058e6e70>
 
 We can now visualize the model’s compartments:
 
@@ -250,7 +250,8 @@ plt.show()
 time](README_files/figure-commonmark/gentime-visualization-output-1.png)
 
 Epiworld records agent-agent interactions, and we can graph those too.
-In the below example, we only all cases stemming from an index case.
+In the below example, we only track all cases stemming from a specific
+index case, despite the model having a prevalence of 0.01.
 
 ``` python
 import networkx as nx
