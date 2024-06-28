@@ -130,13 +130,8 @@ treat_as_file:
   return directory;
 }
 
-static std::vector<std::string> get_sibling_files(const std::string& filepath) {
-  std::vector<std::string> siblings;
-
-  // Find the directory path and the base filename
-  size_t last_slash_pos = filepath.find_last_of("/\\");
-  std::string directory = (last_slash_pos == std::string::npos) ? "." : filepath.substr(0, last_slash_pos);
-  std::string base_filename = filepath.substr(last_slash_pos + 1);
+static std::vector<std::string> get_files_in_dir(const std::string& directory) {
+  std::vector<std::string> found;
 
 #ifdef _WIN32
   WIN32_FIND_DATA find_file_data;
@@ -144,13 +139,13 @@ static std::vector<std::string> get_sibling_files(const std::string& filepath) {
 
   if (hFind == INVALID_HANDLE_VALUE) {
     std::cerr << "Error opening directory: " << GetLastError() << std::endl;
-    return siblings;
+    return found;
   }
 
   do {
     std::string file_name = find_file_data.cFileName;
-    if (file_name != base_filename && !(find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-      siblings.push_back(directory + "\\" + file_name);
+    if (!(find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+      found.push_back(directory + "\\" + file_name);
     }
   } while (FindNextFile(hFind, &find_file_data) != 0);
 
@@ -161,20 +156,20 @@ static std::vector<std::string> get_sibling_files(const std::string& filepath) {
 
   if (dir == nullptr) {
     throw std::runtime_error(directory + ": " + strerror(errno));
-    return siblings;
+    return found;
   }
 
   while ((entry = readdir(dir)) != nullptr) {
     std::string file_name = entry->d_name;
-    if (file_name != base_filename && entry->d_type != DT_DIR) {
-      siblings.push_back(directory + "/" + file_name);
+    if (entry->d_type != DT_DIR) {
+      found.push_back(directory + "/" + file_name);
     }
   }
 
   closedir(dir);
 #endif
 
-  return siblings;
+  return found;
 }
 
 inline std::string temp_id(size_t len) {
@@ -240,11 +235,11 @@ inline Saver::Saver(
 
 inline void Saver::unlink_siblings() const {
     auto dir = dirname(fn);
-    auto siblings = get_sibling_files(dir);
+    auto contestants = get_files_in_dir(dir);
 
-    for (auto sibling : siblings) {
-      if (unlink(sibling.c_str()) != 0) {
-        throw std::runtime_error("Failed to remove file " + sibling + ": " + strerror(errno));
+    for (auto contestant : contestants) {
+      if (unlink(contestant.c_str()) != 0 && errno != ENOENT) {
+        throw std::runtime_error("Failed to remove file " + contestant + ": " + strerror(errno));
       }
     }
   }
