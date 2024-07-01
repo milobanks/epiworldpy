@@ -73,7 +73,7 @@ covid19.print(False)
      - Prob. Recovery       : 0.1400
      - Prob. Transmission   : 0.1000
 
-    <epiworldpy._core.ModelSEIRCONN at 0x105d14930>
+    <epiworldpy._core.ModelSEIRCONN at 0x1058e6e70>
 
 Let’s run it and to see what we get:
 
@@ -99,8 +99,8 @@ covid19.print(False)
     Number of entities  : 0
     Days (duration)     : 100 (of 100)
     Number of viruses   : 1
-    Last run elapsed t  : 13.00ms
-    Last run speed      : 73.78 million agents x day / second
+    Last run elapsed t  : 14.00ms
+    Last run speed      : 70.84 million agents x day / second
     Rewiring            : off
 
     Global events:
@@ -130,9 +130,9 @@ covid19.print(False)
      - Infected     0.00  0.00  0.86  0.14
      - Recovered    0.00  0.00  0.00  1.00
 
-    <epiworldpy._core.ModelSEIRCONN at 0x105d14930>
+    <epiworldpy._core.ModelSEIRCONN at 0x1058e6e70>
 
-We can know visualize the resulting time series:
+We can now visualize the model’s compartments:
 
 ``` python
 import numpy as np
@@ -163,7 +163,7 @@ for state in unique_states:
 plt.figure(figsize=(10, 6))
 
 for state in unique_states:
-  plt.plot(unique_dates, time_series_data[state], marker='o', label=state)
+  plt.plot(unique_dates, time_series_data[state], label=state)
 
 plt.xlabel('Day')
 plt.ylabel('Count')
@@ -173,5 +173,144 @@ plt.grid(True)
 plt.show()
 ```
 
-![The data resulting from the COVID-19 SEIR model
-run](README_files/figure-commonmark/series-visualization-output-1.png)
+![COVID-19 SEIR model
+data](README_files/figure-commonmark/series-visualization-output-1.png)
+
+We can get the effective reproductive number, over time, too:
+
+``` python
+reproductive_data = covid19.get_db().get_reproductive_number()
+
+# Start the plotting!
+plt.figure(figsize=(10, 6))
+
+for virus_id, virus_data in enumerate(reproductive_data):
+    average_rts = list()
+    
+    for date_data in virus_data:
+        if not date_data:
+            continue
+
+        keys_array = np.array(list(date_data.values()), dtype=np.float64)
+        average_rts.append(np.mean(keys_array))
+
+    plt.plot(range(0, len(virus_data)-1), average_rts, label=f"Virus {virus_id}")
+
+plt.xlabel('Date')
+plt.ylabel('Effective Reproductive Rate')
+plt.title('COVID-19 SEIR Model Effective Reproductive Rate')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+![COVID-19 SEIR model effective reproductive
+number](README_files/figure-commonmark/rt-visualization-output-1.png)
+
+Let’s do the same for generation time:
+
+``` python
+from collections import defaultdict
+
+generation_time = covid19.get_db().get_generation_time()
+agents = generation_time['agents']
+viruses = generation_time['viruses']
+times = generation_time['times']
+gentimes = generation_time['gentimes']
+
+# Data formatting
+unique_viruses = np.unique(viruses)
+data = defaultdict(lambda: defaultdict(list))
+
+for agent, virus, time, gentime in zip(agents, viruses, times, gentimes):
+    data[virus][time].append(gentime)
+
+average_data = {virus: {} for virus in unique_viruses}
+
+for virus, time_dict in data.items():
+    for time, gentime_list in time_dict.items():
+        average_data[virus][time] = np.mean(gentime_list)
+
+# Plotting
+plt.figure(figsize=(10, 6))
+for virus, time_dict in average_data.items():
+    times = sorted(time_dict.keys())
+    gentimes = [time_dict[time] for time in times]
+    plt.plot(times, gentimes, label=f'Virus {virus}')
+
+plt.xlabel('Date')
+plt.ylabel('Generation Time')
+plt.title('COVID-19 SEIR Model Generation Time')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+![COVID-19 SEIR model generation
+time](README_files/figure-commonmark/gentime-visualization-output-1.png)
+
+Epiworld records agent-agent interactions, and we can graph those too.
+In the below example, we only track all cases stemming from a specific
+index case, despite the model having a prevalence of 0.01.
+
+``` python
+import networkx as nx
+from matplotlib.animation import FuncAnimation
+
+transmissions = covid19.get_db().get_transmissions()
+start = transmissions['source_exposure_dates']
+end = transmissions['dates']
+source = transmissions['sources']
+target = transmissions['targets']
+days = max(end)
+
+graph = nx.Graph()
+fig, ax = plt.subplots(figsize=(6,4))
+
+# Animation function
+to_track = { source[0] }
+def update(frame):
+    ax.clear()
+    
+    agents_involved_today = set()
+    agents_relationships_we_care_about = []
+    
+    # Get only the agents involved in the current frame.
+    for i in range(len(start)):
+        if start[i] <= frame <= end[i]:
+            agents_involved_today.add((source[i], target[i]))
+
+    # Get only today's agents who have some connection to agents
+    # we've seen before.
+    for agent in agents_involved_today:
+        if agent[0] in to_track or agent[1] in to_track:
+            to_track.add(agent[0])
+            to_track.add(agent[1])
+            graph.add_edge(agent[0], agent[1])
+
+    # Lay and space them out.
+    pos = nx.kamada_kawai_layout(graph)
+
+    options = {
+        "with_labels": True,
+        "node_size": 300,
+        "font_size": 6,
+        "node_color": "white",
+        "edgecolors": "white",
+        "linewidths": 1,
+        "width": 1,
+    }
+
+    # Graph!
+    nx.draw_networkx(graph, pos, **options)
+    ax.set_title(f"COVID-19 SEIR Model Agent Contact (Day {frame})")
+
+ani = FuncAnimation(fig, update, frames=int(days/3), interval=200, repeat=False)
+plt.show()
+```
+
+<!-- I couldn't figure out a way to get Quarto to do animations correctly so we're
+  hardcoding a GIF. -->
+
+![Contact information from the COVID-19 SEIR model
+run](README_files/figure-commonmark/contact-visualization-output-1.gif)
