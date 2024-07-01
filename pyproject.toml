@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.3.3", "pybind11", "matplotlib>=3.5.0"]
+requires = ["scikit-build-core>=0.3.3", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 
@@ -26,7 +26,7 @@ dependencies = ["numpy"]
 
 [project.optional-dependencies]
 test = ["pytest"]
-
+viz = ["ipympl>=0.8", "matplotlib>=3.5.0", "networkx>=3.0", "scipy>=1.0"]
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
