@@ -1,0 +1,10 @@
+.cache/
+.ipynb_checkpoints/
+.pytest_cache/
+_build/
+build/
+__pycache__/
+
+compile_commands.json
+*.html
+*.ipynb
