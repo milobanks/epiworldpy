@@ -13,7 +13,17 @@ include_directories(include/epiworld)
 
 python_add_library(_core MODULE
     src/models/model.cpp
+    src/models/diffnet.cpp
+    src/models/seir.cpp
     src/models/seirconn.cpp
+    src/models/seird.cpp
+    src/models/sir.cpp
+    src/models/sirconn.cpp
+    src/models/sird.cpp
+    src/models/sirdconn.cpp
+    src/models/sis.cpp
+    src/models/sisd.cpp
+    src/models/surv.cpp
     src/database.cpp
     src/main.cpp
     WITH_SOABI)

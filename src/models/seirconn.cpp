@@ -9,9 +9,9 @@ namespace py = pybind11;
 
 /* Proxy constructor. */
 std::shared_ptr<epimodels::ModelSEIRCONN<int>>
-ModelSEIR(std::string name, int n, double prevalence, double contact_rate,
-		  double transmission_rate, double incubation_days,
-		  double recovery_rate) {
+ModelSEIRCONN(std::string name, int n, double prevalence, double contact_rate,
+			  double transmission_rate, double incubation_days,
+			  double recovery_rate) {
 
 	std::shared_ptr<epimodels::ModelSEIRCONN<int>> object(
 		new epimodels::ModelSEIRCONN<int>(name, n, prevalence, contact_rate,
@@ -43,8 +43,8 @@ void epiworldpy::export_seirconn(
 }
 
 void epiworldpy::export_sierconn_constructor(pybind11::module &m) {
-	m.def("ModelSEIR", &ModelSEIR, "Create a new SEIR model.", py::arg("name"),
-		  py::arg("n"), py::arg("prevalence"), py::arg("contact_rate"),
-		  py::arg("transmission_rate"), py::arg("incubation_days"),
-		  py::arg("recovery_rate"));
+	m.def("ModelSEIRCONN", &ModelSEIRCONN, "Create a new SEIRCONN model.",
+		  py::arg("name"), py::arg("n"), py::arg("prevalence"),
+		  py::arg("contact_rate"), py::arg("transmission_rate"),
+		  py::arg("incubation_days"), py::arg("recovery_rate"));
 }
