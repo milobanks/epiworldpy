@@ -10,7 +10,10 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = ["numpy"]
 
-authors = [{ name = "George G. Vega Yon", email = "g.vegayon@gmail.com" }]
+authors = [
+    { name = "George G. Vega Yon", email = "g.vegayon@gmail.com" },
+    { name = "Milo Banks", email = "milobanks@rowlandhall.org" },
+]
 
 classifiers = [
     "Development Status :: 4 - Beta",
