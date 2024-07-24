@@ -16,6 +16,10 @@ static std::shared_ptr<DataBase<int>> get_db(Model<int> &self) {
 void epiworldpy::export_model(py::class_<epiworld::Model<int>> &c) {
 	c.def("get_name", &Model<int>::get_name,
 		  "Get the name of the type of model.")
+		.def("agents_from_edgelist", &Model<int>::agents_from_edgelist,
+			 "Populatates the model's agents from an edge list.",
+			 py::arg("source"), py::arg("target"), py::arg("size"),
+			 py::arg("directed"))
 		.def("print", &Model<int>::print, "Print a summary of the model run.",
 			 py::arg("summary") = true)
 		.def("run", &Model<int>::run,
