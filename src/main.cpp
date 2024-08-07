@@ -140,6 +140,60 @@ PYBIND11_MODULE(_core, m) {
 
             /* EpiworldR does this so we do too. */
             return model;
+        })
+        .def("run_multiple_get_results", [](Saver &self, const py::args& args) {
+        	auto csvloc = self.get_cvsloc();
+         	std::vector<std::vector<std::vector<int>>> results;
+         	std::vector<std::string> whats;
+            std::vector<std::string> valid_whats = {
+                "total_hist",
+                "virus_info",
+                "virus_hist",
+                "tool_info",
+                "tool_hist",
+                "transmission",
+                "transition",
+                "reproductive",
+                "generation"
+            };
+
+            /* Make sure valid arguments are passed into this constructor, and marshall
+            * things out all the same. */
+            for (auto arg : args) {
+                std::string whatum = arg.cast<std::string>();
+
+                if (std::find(valid_whats.begin(), valid_whats.end(), whatum) == valid_whats.end()) {
+                    throw std::invalid_argument("What '" + whatum + "' is not supported.");
+                }
+
+                whats.push_back(whatum);
+            }
+
+            for (auto what : whats) {
+	           	std::ifstream t(std::string(csvloc) + what);
+	            std::stringstream buffer;
+	            buffer << t.rdbuf();
+
+				std::vector<std::vector<int>> result;
+			    std::stringstream ss(buffer);
+			    std::string line;
+
+			    while (std::getline(ss, line)) {
+			        std::vector<std::string> row;
+			        std::stringstream line_stream(line);
+			        std::string cell;
+
+			        while (std::getline(line_stream, cell, ',')) {
+			            row.push_back(cell);
+			        }
+
+			        result.push_back(std::atoi(row));
+			    }
+
+				results.push_back(result);
+            }
+
+            return results;
         });
 
     py::class_<DataBase<int>, std::shared_ptr<DataBase<int>>>(m, "DataBase")

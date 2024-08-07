@@ -50,6 +50,7 @@ class Saver {
 private:
   std::function<void(size_t, Model<int>*)> fun;
   std::vector<std::string> what;
+  std::string csvloc;
   std::string fn;
   std::string id;
   bool file_output;
@@ -64,8 +65,19 @@ public:
   void unlink_siblings() const;
   const std::ostream& out(std::ostream &stream) const;
 
+  void set_cvsloc(std::string cvsloc);
+  const std::string_view get_cvsloc() const;
+
   std::function<void(size_t, Model<int>*)> operator*();
 };
+
+inline void Saver::set_cvsloc(std::string cvsloc) {
+	this->csvloc = cvsloc;
+}
+
+inline const std::string_view Saver::get_cvsloc() const {
+	return csvloc;
+}
 
 inline std::ostream& operator<<(std::ostream &stream, const Saver& data) {
   data.out(stream);
@@ -98,7 +110,7 @@ static bool parse_kwarg_bool(const pybind11::kwargs& kwargs, const char* key, bo
   if (item != nullptr) {
     return item == Py_True;
   }
-  
+
   return _default;
 }
 
@@ -270,4 +282,3 @@ inline std::function<void(size_t, Model<int>*)> Saver::operator*() {
 }
 
 #endif
-
