@@ -13,9 +13,74 @@ static std::shared_ptr<DataBase<int>> get_db(Model<int> &self) {
 		&self.get_db(), [](DataBase<int> *) { /* do nothing, no delete */ });
 }
 
+static size_t size(Model<int> &self) { return self.size(); }
+
+static void add_virus(Model<int> &self, Virus<int> &virus) {
+	// TODO
+	virus.set_state(1, 2);
+
+	self.add_virus(virus);
+}
+
+static void add_tool(Model<int> &self, Tool<int> &tool) { self.add_tool(tool); }
+
+static void add_state_1(Model<int> &self, std::string name) {
+	self.add_state(name);
+}
+
+static void add_state_2(Model<int> &self, std::string name,
+						UpdateFun<int> fun) {
+	self.add_state(name, fun);
+}
+
+static void add_param(Model<int> &self, double val, std::string name) {
+	self.add_param(val, name);
+}
+
+static size_t get_n_replicates(Model<int> &self) {
+	return self.get_n_replicates();
+}
+
+static size_t get_n_viruses(Model<int> &self) { return self.get_n_viruses(); }
+
+static size_t get_n_tools(Model<int> &self) { return self.get_n_tools(); }
+
+static size_t get_ndays(Model<int> &self) { return self.get_ndays(); }
+
+static std::vector<std::string> get_states(Model<int> &self) {
+	return self.get_states();
+}
+
+static float get_param(Model<int> &self, std::string name) {
+	return self.get_param(name);
+}
+
+static void set_param(Model<int> &self, std::string name, float val) {
+	self.set_param(name, val);
+}
+
+static std::string get_name(Model<int> &self) { return self.get_name(); }
+
+static void set_name(Model<int> &self, std::string name) {
+	self.set_name(name);
+}
+
+static void queueing_on(Model<int> &self) { self.queuing_on(); }
+static void queueing_off(Model<int> &self) { self.queuing_off(); }
+static void verbose_on(Model<int> &self) { self.verbose_on(); }
+static void verbose_off(Model<int> &self) { self.verbose_off(); }
+
 void epiworldpy::export_model(py::class_<epiworld::Model<int>> &c) {
-	c.def("get_name", &Model<int>::get_name,
-		  "Get the name of the type of model.")
+	c.def(py::init<>())
+		.def("get_name", &Model<int>::get_name,
+			 "Get the name of the type of model.")
+		.def("agents_smallworld", &Model<int>::agents_smallworld,
+			 "Populatates the model's agents from a small world.", py::arg("n"),
+			 py::arg("k"), py::arg("d"), py::arg("p"))
+		.def("agents_from_edgelist", &Model<int>::agents_from_edgelist,
+			 "Populatates the model's agents from an edge list.",
+			 py::arg("source"), py::arg("target"), py::arg("size"),
+			 py::arg("directed"))
 		.def("print", &Model<int>::print, "Print a summary of the model run.",
 			 py::arg("summary") = true)
 		.def("run", &Model<int>::run,
@@ -24,7 +89,36 @@ void epiworldpy::export_model(py::class_<epiworld::Model<int>> &c) {
 		.def("get_db", &get_db,
 			 "Get the data from the model run, which may then be queried with "
 			 "associated methods.",
-			 py::return_value_policy::reference);
+			 py::return_value_policy::reference)
+		.def("size", &size, "Get the number of agents in the model.")
+		.def("add_virus", &add_virus, "Adds a virus to this model.",
+			 py::arg("virus"))
+		.def("add_tool", &add_tool, "Adds a tool to this model.",
+			 py::arg("tool"))
+		.def("add_state", &add_state_1, "Adds a state to this model.",
+			 py::arg("name"))
+		.def("add_state", &add_state_2, "Adds a state to this model.",
+			 py::arg("name"), py::arg("fun"))
+		.def("add_param", &add_param, "Adds a parameter to this model.",
+			 py::arg("value"), py::arg("name"))
+		.def("get_n_replicates", &get_n_replicates,
+			 "Get the number of replicates.")
+		.def("get_n_viruses", &get_n_viruses, "Get the number of viruses.")
+		.def("get_n_tools", &get_n_tools, "Get the number of tools.")
+		.def("get_ndays", &get_ndays, "Get the number of days in the model.")
+		.def("get_states", &get_states,
+			 "Get the states associated with this model.")
+		.def("get_param", &get_param, "Get a model parameter from its name.",
+			 py::arg("name"))
+		.def("set_param", &set_param, "Set a model parameter from its name.",
+			 py::arg("name"), py::arg("val"))
+		.def("get_name", &get_name, "Get the name of the model.")
+		.def("set_name", &set_name, "Set the name of the model.",
+			 py::arg("name"))
+		.def("queuing_on", &verbose_on, "Enabling queuing,")
+		.def("queuing_off", &verbose_off, "Disabling queuing.")
+		.def("verbose_on", &verbose_on, "Turn up the verbosity.")
+		.def("verbose_off", &verbose_off, "Turn off the verbosity.");
 }
 
 void epiworldpy::export_all_models(pybind11::module &m) {
@@ -165,4 +259,30 @@ void epiworldpy::export_surv(MODEL_CHILD_TYPE(SURV) & c) {
 		  py::arg("prop_vax_redux_infect"), py::arg("surveillance_prob"),
 		  py::arg("transmission_rate"), py::arg("prob_death"),
 		  py::arg("prob_noreinfect"));
+}
+
+static UpdateFun<int>
+new_update_fun(const std::function<void(Agent<int> *, Model<int> *)> &fun) {
+	return UpdateFun<int>(fun);
+}
+
+static UpdateFun<int> default_update_susceptible_cpp() {
+	return UpdateFun<int>(default_update_susceptible<int>);
+}
+
+static UpdateFun<int> default_update_exposed_cpp() {
+	return UpdateFun<int>(default_update_exposed<int>);
+}
+
+void epiworldpy::export_update_fun(
+	pybind11::class_<epiworld::UpdateFun<int>,
+					 std::shared_ptr<epiworld::UpdateFun<int>>> &c) {
+	c.def_static("new_update_fun", &new_update_fun,
+				 "Create a new compartment update function based off a lambda.",
+				 py::arg("fun"))
+		.def_static("default_update_susceptible",
+					&default_update_susceptible_cpp,
+					"Update the susceptible compartment automatically.")
+		.def_static("default_update_exposed", &default_update_exposed_cpp,
+					"Update the exposed compartment automatically.");
 }
