@@ -16,9 +16,9 @@ static std::shared_ptr<DataBase<int>> get_db(Model<int> &self) {
 void epiworldpy::export_model(py::class_<epiworld::Model<int>> &c) {
 	c.def("get_name", &Model<int>::get_name,
 		  "Get the name of the type of model.")
-		.def("print", &epimodels::ModelDiffNet<int>::print,
-			 "Print a summary of the model run.", py::arg("summary") = true)
-		.def("run", &epimodels::ModelDiffNet<int>::run,
+		.def("print", &Model<int>::print, "Print a summary of the model run.",
+			 py::arg("summary") = true)
+		.def("run", &Model<int>::run,
 			 "Run the model according to the previously specific parameters.",
 			 py::arg("ndays"), py::arg("seed") = 1u)
 		.def("get_db", &get_db,
