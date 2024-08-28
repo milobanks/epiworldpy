@@ -28,6 +28,11 @@ jobs:
             - name: Setup Pages
               uses: actions/configure-pages@v4
 
+            - name: Set up Quarto
+              uses: quarto-dev/quarto-actions/setup@v2
+              with:
+                  version: 1.4.515
+
             - name: Set up Python
               uses: actions/setup-python@v5
               with:
@@ -40,6 +45,9 @@ jobs:
               run: poetry install -C docs
 
             # Building
+            - name: Render Quarto File
+              run: quarto render README.qmd --to rst && mv README.rst docs/index.rst
+
             - name: Build HTML using Poetry
               run: poetry run -C docs sphinx-build -M html docs/source/ docs/build/
 
