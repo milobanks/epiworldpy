@@ -1,10 +1,12 @@
 #include "database.hpp"
 
 #include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 using namespace epiworld;
 using namespace epiworldpy;
+using namespace pybind11::literals;
 namespace py = pybind11;
 
 static py::dict get_hist_total(DataBase<int> &self) {
