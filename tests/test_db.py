@@ -5,7 +5,7 @@ DAYS = 100
 
 @pytest.fixture
 def covid19():
-    covid19 = epiworld.ModelSEIR(
+    covid19 = epiworld.ModelSEIRCONN(
         name              = 'covid-19',
         n                 = 10000,
         prevalence        = .01,
