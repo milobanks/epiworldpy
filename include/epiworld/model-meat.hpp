@@ -157,7 +157,7 @@ inline void Model<TSeq>::events_add(
     Entity<TSeq> * entity_,
     epiworld_fast_int new_state_,
     epiworld_fast_int queue_,
-    ActionFun<TSeq> call_,
+    EventFun<TSeq> call_,
     int idx_agent_,
     int idx_object_
 ) {
@@ -166,7 +166,7 @@ inline void Model<TSeq>::events_add(
 
     #ifdef EPI_DEBUG
     if (nactions == 0)
-        throw std::logic_error("Actions cannot be zero!!");
+        throw std::logic_error("Events cannot be zero!!");
     #endif
 
     if (nactions > events.size())
@@ -411,13 +411,6 @@ inline Model<TSeq>::Model(const Model<TSeq> & model) :
         for (auto & p : population_backup)
             p.model = this;
 
-    for (auto & e : entities)
-        e.model = this;
-
-    if (entities_backup.size() != 0u)
-        for (auto & e : entities_backup)
-            e.model = this;
-
     // Pointing to the right place. This needs
     // to be done afterwards since the state zero is set as a function
     // of the population.
@@ -502,13 +495,6 @@ inline Model<TSeq> & Model<TSeq>::operator=(const Model<TSeq> & m)
         for (auto & p : population_backup)
             p.model = this;
 
-    for (auto & e : entities)
-        e.model = this;
-
-    if (entities_backup.size() != 0)
-        for (auto & e : entities_backup)
-            e.model = this;
-
     db = m.db;
     db.model = this;
     db.user_data.model = this;
@@ -572,6 +558,13 @@ inline DataBase<TSeq> & Model<TSeq>::get_db()
 {
     return db;
 }
+
+template<typename TSeq>
+inline const DataBase<TSeq> & Model<TSeq>::get_db() const
+{
+    return db;
+}
+
 
 template<typename TSeq>
 inline std::vector<Agent<TSeq>> & Model<TSeq>::get_agents()
@@ -776,7 +769,7 @@ inline void Model<TSeq>::dist_entities()
     for (auto & entity: entities)
     {
 
-        entity.distribute();
+        entity.distribute(this);
 
         // Apply the events
         events_run();
@@ -960,7 +953,6 @@ template<typename TSeq>
 inline void Model<TSeq>::add_entity(Entity<TSeq> e)
 {
 
-    e.model = this;
     e.id = entities.size();
     entities.push_back(e);
 
@@ -1418,15 +1410,6 @@ inline void Model<TSeq>::run_multiple(
 
     // Seeds will be reproducible by default
     std::vector< int > seeds_n(nexperiments);
-    // #ifdef EPI_DEBUG
-    // std::fill(
-    //     seeds_n.begin(),
-    //     seeds_n.end(),
-    //     std::floor(
-    //         runif() * static_cast<double>(std::numeric_limits<int>::max())
-    //     )
-    //     );
-    // #else
     for (auto & s : seeds_n)
     {
         s = static_cast<int>(
@@ -1929,47 +1912,6 @@ inline void Model<TSeq>::reset() {
 // Too big to keep here
 #include "model-meat-print.hpp"
 
-template<typename TSeq>
-inline Model<TSeq> && Model<TSeq>::clone() const {
-
-    // Step 1: Regen the individuals and make sure that:
-    //  - Neighbors point to the right place
-    //  - DB is pointing to the right place
-    Model<TSeq> res(*this);
-
-    // Removing old neighbors
-    for (auto & p: res.population)
-        p.neighbors.clear();
-    
-    // Rechecking individuals
-    for (epiworld_fast_uint p = 0u; p < size(); ++p)
-    {
-        // Making room
-        const Agent<TSeq> & agent_this = population[p];
-        Agent<TSeq> & agent_res  = res.population[p];
-
-        // Agent pointing to the right model and agent
-        agent_res.model         = &res;
-        agent_res.viruses.agent = &agent_res;
-        agent_res.tools.agent   = &agent_res;
-
-        // Readding
-        std::vector< Agent<TSeq> * > neigh = agent_this.neighbors;
-        for (epiworld_fast_uint n = 0u; n < neigh.size(); ++n)
-        {
-            // Point to the right neighbors
-            int loc = res.population_ids[neigh[n]->get_id()];
-            agent_res.add_neighbor(res.population[loc], true, true);
-
-        }
-
-    }
-
-    return res;
-
-}
-
-
 
 template<typename TSeq>
 inline void Model<TSeq>::add_state(
@@ -2132,9 +2074,12 @@ inline void Model<TSeq>::set_param(std::string pname, epiworld_double value)
 // }
 
 template<typename TSeq>
-inline epiworld_double Model<TSeq>::par(std::string pname)
+inline epiworld_double Model<TSeq>::par(std::string pname) const
 {
-    return parameters[pname];
+    const auto iter = parameters.find(pname);
+    if (iter == parameters.end())
+        throw std::logic_error("The parameter " + pname + " does not exists.");
+    return iter->second;
 }
 
 #define DURCAST(tunit,txtunit) {\

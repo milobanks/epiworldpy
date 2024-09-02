@@ -43,11 +43,12 @@ public:
      * @param transmission_rate The transmission rate of the disease in the model.
      * @param avg_incubation_days The average incubation period of the disease in the model.
      * @param recovery_rate The recovery rate of the disease in the model.
-     * @param contact_matrix The contact matrix between entities in the model.
+     * @param contact_matrix The contact matrix between entities in the model. Specified in
+     * column-major order.
      */
     ModelSEIRMixing(
         ModelSEIRMixing<TSeq> & model,
-        std::string vname,
+        const std::string & vname,
         epiworld_fast_uint n,
         epiworld_double prevalence,
         epiworld_double contact_rate,
@@ -70,7 +71,7 @@ public:
      * @param contact_matrix The contact matrix between entities in the model.
      */
     ModelSEIRMixing(
-        std::string vname,
+        const std::string & vname,
         epiworld_fast_uint n,
         epiworld_double prevalence,
         epiworld_double contact_rate,
@@ -237,7 +238,7 @@ inline ModelSEIRMixing<TSeq> & ModelSEIRMixing<TSeq>::run(
     int seed
 )
 {
-    
+
     Model<TSeq>::run(ndays, seed);
     return *this;
 
@@ -280,7 +281,7 @@ inline Model<TSeq> * ModelSEIRMixing<TSeq>::clone_ptr()
 template<typename TSeq>
 inline ModelSEIRMixing<TSeq>::ModelSEIRMixing(
     ModelSEIRMixing<TSeq> & model,
-    std::string vname,
+    const std::string & vname,
     epiworld_fast_uint n,
     epiworld_double prevalence,
     epiworld_double contact_rate,
@@ -476,7 +477,7 @@ inline ModelSEIRMixing<TSeq>::ModelSEIRMixing(
 
 template<typename TSeq>
 inline ModelSEIRMixing<TSeq>::ModelSEIRMixing(
-    std::string vname,
+    const std::string & vname,
     epiworld_fast_uint n,
     epiworld_double prevalence,
     epiworld_double contact_rate,
