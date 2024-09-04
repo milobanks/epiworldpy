@@ -15,7 +15,7 @@ python_add_library(_core MODULE
     src/database.cpp
     src/main.cpp
     src/model.cpp
-    src/model.cpp
+    src/saver.cpp
     src/tool.cpp
     src/virus.cpp
     WITH_SOABI)

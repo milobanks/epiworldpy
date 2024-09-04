@@ -1,7 +1,7 @@
 import epiworldpy as epiworld
 
 def test_saver_basic():
-    covid19 = epiworld.ModelSEIR(
+    covid19 = epiworld.ModelSEIRCONN(
         name              = 'covid-19',
         n                 = 10000,
         prevalence        = .01,
