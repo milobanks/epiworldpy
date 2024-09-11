@@ -220,7 +220,7 @@ protected:
         Entity<TSeq> * entity_,
         epiworld_fast_int new_state_,
         epiworld_fast_int queue_,
-        ActionFun<TSeq> call_,
+        EventFun<TSeq> call_,
         int idx_agent_,
         int idx_object_
         );
@@ -261,17 +261,6 @@ public:
 
     virtual ~Model() {};
 
-    void clone_population(
-        std::vector< Agent<TSeq> > & other_population,
-        std::vector< Entity<TSeq> > & other_entities,
-        Model<TSeq> * other_model,
-        bool & other_directed
-    ) const ;
-
-    void clone_population(
-        const Model<TSeq> & other_model
-    );
-
     /**
      * @name Set the backup object
      * @details `backup` can be used to restore the entire object
@@ -285,6 +274,7 @@ public:
     ///@}
 
     DataBase<TSeq> & get_db();
+    const DataBase<TSeq> & get_db() const;
     epiworld_double & operator()(std::string pname);
 
     size_t size() const;
@@ -533,8 +523,6 @@ public:
     virtual void reset();
     const Model<TSeq> & print(bool lite = false) const;
 
-    Model<TSeq> && clone() const;
-
     /**
      * @name Manage state (states) in the model
      * 
@@ -611,7 +599,7 @@ public:
     // void set_param(size_t k, epiworld_double val);
     void set_param(std::string pname, epiworld_double val);
     // epiworld_double par(epiworld_fast_uint k);
-    epiworld_double par(std::string pname);
+    epiworld_double par(std::string pname) const;
     ///@}
 
     void get_elapsed(

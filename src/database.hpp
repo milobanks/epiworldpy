@@ -1,7 +1,7 @@
 #ifndef EPIWORLDPY_DATABASE_HPP
 #define EPIWORLDPY_DATABASE_HPP
 
-#include "interface.hpp"
+#include "epiworld-common.hpp"
 #include <pybind11/pybind11.h>
 
 namespace epiworldpy {

@@ -21,7 +21,7 @@ public:
 
     ModelSIRCONN(
         ModelSIRCONN<TSeq> & model,
-        std::string vname,
+        const std::string & vname,
         epiworld_fast_uint n,
         epiworld_double prevalence,
         epiworld_double contact_rate,
@@ -30,7 +30,7 @@ public:
     );
 
     ModelSIRCONN(
-        std::string vname,
+        const std::string & vname,
         epiworld_fast_uint n,
         epiworld_double prevalence,
         epiworld_double contact_rate,
@@ -66,6 +66,15 @@ public:
         return infected.size();
     }
 
+    /***
+     * @brief Compute expected generation time
+     * @param max_days Maximum number of days.
+     * @param max_contacts Maximum number of contacts.
+     */
+    std::vector< double > generation_time_expected(
+        int max_days = 200,
+        int max_contacts = 200
+    ) const;
 
 };
 
@@ -143,7 +152,7 @@ inline Model<TSeq> * ModelSIRCONN<TSeq>::clone_ptr()
 template<typename TSeq>
 inline ModelSIRCONN<TSeq>::ModelSIRCONN(
     ModelSIRCONN<TSeq> & model,
-    std::string vname,
+    const std::string & vname,
     epiworld_fast_uint n,
     epiworld_double prevalence,
     epiworld_double contact_rate,
@@ -324,7 +333,7 @@ inline ModelSIRCONN<TSeq>::ModelSIRCONN(
 
 template<typename TSeq>
 inline ModelSIRCONN<TSeq>::ModelSIRCONN(
-    std::string vname,
+    const std::string & vname,
     epiworld_fast_uint n,
     epiworld_double prevalence,
     epiworld_double contact_rate,
@@ -361,5 +370,54 @@ inline ModelSIRCONN<TSeq> & ModelSIRCONN<TSeq>::initial_states(
 
 }
 
+template<typename TSeq>
+inline std::vector< double > ModelSIRCONN<TSeq>::generation_time_expected(
+    int max_days,
+    int max_contacts
+) const
+{
+
+    // Retrieving total counts
+    std::vector< int > h_date;
+    std::vector< std::string > h_state;
+    std::vector< int > h_counts;
+    const auto this_const = dynamic_cast<const ModelSIRCONN<TSeq> *>(this);
+    this_const->get_db().get_hist_total(
+        &h_date,
+        &h_state,
+        &h_counts
+    );
+
+    // Retrieving information on susceptibles
+    std::vector< double > S(this_const->get_ndays(), 0.0);
+    for (size_t i = 0; i < h_date.size(); ++i)
+    {
+        if (h_state[i] == "Susceptible")
+            S[h_date[i]] += h_counts[i];
+    }
+
+    // The generation time in the SIR model starts from 1, as agents 
+    // spend at least one day in the infected state before starting
+    // transmitting.
+    std::vector< double > gen_times(this_const->get_ndays(), 1.0);
+    double p_c = this_const->par("Contact rate")/this_const->size();
+    double p_i = this_const->par("Transmission rate");
+    double p_r = this_const->par("Recovery rate");
+    for (size_t i = 0u; i < this_const->get_ndays(); ++i)
+    {
+        gen_times[i] = gen_int_mean(
+            S[i],
+            p_c,
+            p_i,
+            p_r,
+            max_days,
+            max_contacts
+        );
+
+    }
+
+    return gen_times;
+
+}
 
 #endif
