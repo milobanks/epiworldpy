@@ -37,11 +37,11 @@ jobs:
               with:
                   python-version: "3.12"
 
-            - name: Install Poetry
-              run: pip install poetry
+            # - name: Install Poetry
+            #   run: pip install poetry
 
-            - name: Install dependencies with Poetry
-              run: poetry install
+            - name: Install the package
+              run: pip install .
 
             # Building
             - name: Render Quarto File
