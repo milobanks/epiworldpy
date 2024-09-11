@@ -17,7 +17,6 @@ permissions:
 
 jobs:
     build:
-        needs: render-docs
         runs-on: ubuntu-latest
         permissions:
             contents: write
