@@ -41,7 +41,7 @@ jobs:
               run: pip install poetry
 
             - name: Install dependencies with Poetry
-              run: poetry install -C docs
+              run: poetry install
 
             # Building
             - name: Render Quarto File
