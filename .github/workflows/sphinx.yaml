@@ -1,4 +1,4 @@
-name: shinx
+name: sphinx
 
 on:
   push:
