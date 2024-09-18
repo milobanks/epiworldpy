@@ -29,7 +29,7 @@ Here we show how to create a `SEIR` object and add terms to it. We will use the 
 import epiworldpy as epiworld
 
 # Create a SEIR model (susceptible, exposed, infectious, recovered), representing COVID-19.
-covid19 = epiworld.ModelSEIR(
+covid19 = epiworld.ModelSEIRCONN(
   name              = 'covid-19',
   n                 = 10000,
   prevalence        = .01,
