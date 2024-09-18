@@ -23,7 +23,7 @@ using namespace epiworld;
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 PYBIND11_MODULE(_core, m) {
-	m.doc() = R"pbdoc(
+	/* m.doc() = R"pbdoc(
         Epiworld Python Wrapper
         -----------------------
 
@@ -33,7 +33,7 @@ PYBIND11_MODULE(_core, m) {
            :toctree: _generate
 
            ModelSEIR
-    )pbdoc";
+    )pbdoc"; */
 
 	auto model = py::class_<Model<int>>(
 		m, "Model", "A generic model of some kind; a parent class.");
