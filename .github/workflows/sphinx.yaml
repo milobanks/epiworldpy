@@ -51,7 +51,7 @@ jobs:
         run: quarto render README.qmd --to rst && mv README.rst docs/index.rst
 
       - name: Build HTML using Sphinx
-        run: cd docs && sphinx-build -M html docs/source/ docs/build/
+        run: sphinx-build -M html docs/source/ docs/build/
 
       # Upload
       - name: Upload artifacts
