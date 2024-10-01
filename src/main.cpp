@@ -15,6 +15,8 @@
 #include "model-bones.hpp"
 #include "model.hpp"
 #include "saver.hpp"
+#include "tool.hpp"
+#include "virus.hpp"
 
 namespace py = pybind11;
 using namespace epiworld;
@@ -47,6 +49,8 @@ PYBIND11_MODULE(_core, m) {
 		  Saver
     )pbdoc";
 
+  auto update_fun =
+      py::class_<UpdateFun<int>>(m, "UpdateFun", "Model update functions.");
   auto model = py::class_<Model<int>>(
       m, "Model", "A generic model of some kind; a parent class.");
   auto database = py::class_<DataBase<int>, std::shared_ptr<DataBase<int>>>(
@@ -54,11 +58,17 @@ PYBIND11_MODULE(_core, m) {
   auto saver =
       py::class_<epiworldpy::Saver, std::shared_ptr<epiworldpy::Saver>>(
           m, "Saver", "Saves the result of multiple runs.");
+  auto tool =
+      py::class_<Tool<int>>(m, "Tool", "A tool for modifying virus spread.");
+  auto virus = py::class_<Virus<int>>(m, "Virus", "A virus.");
 
+  epiworldpy::export_update_fun(update_fun);
   epiworldpy::export_model(model);
   epiworldpy::export_all_models(m);
   epiworldpy::export_database(database);
   epiworldpy::export_saver(saver);
+  epiworldpy::export_tool(tool);
+  epiworldpy::export_virus(virus);
 
 #ifdef VERSION_INFO
   /* Give the real version. */
