@@ -9,3 +9,6 @@ compile_commands.json
 *.html
 *.ipynb
 .nocheck/
+
+*_files
+!README_files
