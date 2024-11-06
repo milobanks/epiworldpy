@@ -49,8 +49,8 @@ jobs:
       # Building
       - name: Render Quarto File
         run: |
-          quarto render README.qmd --to rst
-          mv README.rst docs/index.rst
+          quarto render README.qmd --to md
+          mv README.md docs/index.md
 
       - name: Build HTML using Sphinx
         run: sphinx-build -M html docs docs/build/

@@ -1,10 +1,10 @@
 ---
 format: gfm
-jupyter: python3
 title: "epiworldpy: Python bindings for epiworld"
 ---
 
-[![Pip Build](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yaml/badge.svg)](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yaml)
+[![](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yaml/badge.svg)](https://github.com/UofUEpiBio/epiworldpy/actions/workflows/pip.yaml)
+[![](https://img.shields.io/pypi/v/epiworldpy.svg)](https://pypi.org/project/epiworldpy)
 
 This is a python wrapper of the [`epiworld c++` library][epiworld-git], an ABM
 simulation engine. This is possible using the
@@ -20,9 +20,9 @@ The `epiworld` module is already
 
 # API
 
-You can find API documentation on the [API page](/api.html).
+You can find API documentation on the <a href="/api.html">API page</a>.
 
-# Examples 
+# Examples
 
 ## Basic
 
@@ -61,7 +61,7 @@ We can now visualize the model's compartments:
 
 ```{python}
 #| label: series-visualization
-#| fig-cap: "COVID-19 SEIR model data"
+#| fig-cap: ""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -105,7 +105,7 @@ We can get the effective reproductive number, over time, too:
 
 ```{python}
 #| label: rt-visualization
-#| fig-cap: "COVID-19 SEIR model effective reproductive number"
+#| fig-cap: ""
 reproductive_data = covid19.get_db().get_reproductive_number()
 
 # Start the plotting!
@@ -113,7 +113,7 @@ plt.figure(figsize=(10, 6))
 
 for virus_id, virus_data in enumerate(reproductive_data):
     average_rts = list()
-    
+
     for date_data in virus_data:
         if not date_data:
             continue
@@ -135,7 +135,7 @@ Let's do the same for generation time:
 
 ```{python}
 #| label: gentime-visualization
-#| fig-cap: "COVID-19 SEIR model generation time"
+#| fig-cap: ""
 from collections import defaultdict
 
 generation_time = covid19.get_db().get_generation_time()
@@ -176,7 +176,7 @@ Epiworld records agent-agent interactions, and we can graph those too. In the be
 
 ```{python}
 #| label: contact-visualization
-#| fig-cap: "COVID-19 SEIR model agent contact"
+#| fig-cap: ""
 #| eval: false
 
 import networkx as nx
@@ -196,10 +196,10 @@ fig, ax = plt.subplots(figsize=(6,4))
 to_track = { source[0] }
 def update(frame):
     ax.clear()
-    
+
     agents_involved_today = set()
     agents_relationships_we_care_about = []
-    
+
     # Get only the agents involved in the current frame.
     for i in range(len(start)):
         if start[i] <= frame <= end[i]:
@@ -236,7 +236,7 @@ plt.show()
 
 <!-- I couldn't figure out a way to get Quarto to do animations correctly so we're
   hardcoding a GIF. -->
-![Contact information from the COVID-19 SEIR model run](README_files/figure-commonmark/contact-visualization-output-1.gif)
+![](README_files/figure-markdown_strict/contact-visualization-output-1.gif)
 
 [epiworld-git]: https://github.com/UofUEpiBio/epiworld/
 [`pybind11`]: https://pybind11.readthedocs.io/en/stable/
