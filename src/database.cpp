@@ -299,10 +299,6 @@ void epiworldpy::export_database(
       .def("record", &epiworld::DataBase<int>::record,
            "Register a new variant.")                                       // ?
       .def("reset", &epiworld::DataBase<int>::reset, "Reset the database.") // ?
-      /* FIXME: This should work, as PyBind should automatically convert the
-       * lambda into a py::cpp_function, but I should double check this. */
-      .def("set_seq_hasher", &epiworld::DataBase<int>::set_seq_hasher,
-           "Set the sequence hashing function.")
       .def("record_tool", &epiworld::DataBase<int>::record_tool,
            "Add a new tool to the database.")
       .def("record_virus", &epiworld::DataBase<int>::record_virus,
