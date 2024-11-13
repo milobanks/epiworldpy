@@ -71,7 +71,7 @@ jobs:
         uses: CDCgov/cfa-actions/post-artifact@main
         if: ${{ github.event_name == 'pull_request' }}
         with:
-          artifact-name: readme
+          artifact-name: github-pages
           gh-token: ${{ secrets.GITHUB_TOKEN }}
           message: "Thanks for your contribution, ${{ github.actor }}; your `{ artifact-name }` is ready for download [here]({ artifact-url })."
 
