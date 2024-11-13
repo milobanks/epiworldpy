@@ -21,7 +21,7 @@ target="_blank">implemented in R</a>.
 
 # API
 
-You can find API documentation on the <a href="/api.html">API page</a>.
+You can find API documentation on the <a href="api.html">API page</a>.
 
 # Examples
 
