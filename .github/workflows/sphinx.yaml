@@ -62,13 +62,22 @@ jobs:
           name: github-pages
           path: docs/build/html/
 
-      # Post the artifact pulling the id from the `readme` step.
-      - name: Post the artifact
-        uses: CDCgov/cfa-actions/post-artifact@main
-        if: ${{ github.event_name == 'pull_request' }}
+  post-page-artifact:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Post comment preview
+        uses: CDCgov/cfa-actions/post-artifact@v1.0.0
         with:
           artifact-name: github-pages
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          gh-token: ${{ secrets.GITHUB_TOKEN}}
           message: "Thanks for your contribution, ${{ github.actor }}; your `{ artifact-name }` is ready for download [here]({ artifact-url })."
 
   deploy:
