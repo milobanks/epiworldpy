@@ -11,9 +11,8 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  actions: read
+  pull-requests: write
 
 jobs:
   build:
@@ -59,11 +58,29 @@ jobs:
         run: mv README_files docs/build/html
 
       # Upload
-      - name: Upload artifacts
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages
           path: docs/build/html/
+
+  post-page-artifact:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Post comment preview
+        uses: CDCgov/cfa-actions/post-artifact@v1.0.0
+        with:
+          artifact-name: github-pages
+          gh-token: ${{ secrets.GITHUB_TOKEN}}
+          message: "Thanks for your contribution, ${{ github.actor }}; your `{ artifact-name }` is ready for download [here]({ artifact-url })."
 
   deploy:
     # Deploy to the github-pages environment
