@@ -58,7 +58,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'Epiworldpy'
+project = 'epiworldPy'
 copyright = '2024, George G. Vega Yon'
 author = 'Milo Banks'
 
