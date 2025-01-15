@@ -2,11 +2,8 @@
 .ipynb_checkpoints/
 .pytest_cache/
 _build/
-dist/
 build/
 __pycache__/
-*.egg-info/
-.ropeproject/
 
 compile_commands.json
 *.html
@@ -15,4 +12,3 @@ compile_commands.json
 
 *_files
 !README_files
-
