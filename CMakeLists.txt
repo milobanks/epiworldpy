@@ -13,6 +13,7 @@ include_directories(include/epiworld)
 
 python_add_library(_core MODULE
     src/database.cpp
+    src/entity.cpp
     src/main.cpp
     src/model.cpp
     src/saver.cpp
