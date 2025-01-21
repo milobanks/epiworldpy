@@ -2,61 +2,83 @@
 #define LFMCMC_MEAT_PRINT_HPP
 
 template<typename TData>
-inline void LFMCMC<TData>::print()
+inline void LFMCMC<TData>::print(size_t burnin) const
 {
-    std::vector< epiworld_double > summ_params(n_parameters * 3, 0.0);
-    std::vector< epiworld_double > summ_stats(n_statistics * 3, 0.0);
 
-    for (size_t k = 0u; k < n_parameters; ++k)
+    // For each statistic or parameter in the model, we print three values: 
+    // - mean, the 2.5% quantile, and the 97.5% quantile
+    std::vector< epiworld_double > summ_params(m_n_params * 3, 0.0);
+    std::vector< epiworld_double > summ_stats(m_n_stats * 3, 0.0);
+
+    // Compute the number of samples to use based on burnin rate
+    size_t n_samples_print = m_n_samples;
+    if (burnin > 0)
+    {
+        if (burnin >= m_n_samples)
+            throw std::length_error(
+                "The burnin is greater than or equal to the number of samples."
+                );
+
+        n_samples_print = m_n_samples - burnin;
+
+    }
+
+    epiworld_double n_samples_dbl = static_cast< epiworld_double >(
+        n_samples_print
+        );
+
+    // Compute parameter summary values
+    for (size_t k = 0u; k < m_n_params; ++k)
     {
 
         // Retrieving the relevant parameter
-        std::vector< epiworld_double > par_i(n_samples);
-        for (size_t i = 0u; i < n_samples; ++i)
+        std::vector< epiworld_double > par_i(n_samples_print);
+        for (size_t i = burnin; i < m_n_samples; ++i)
         {
-            par_i[i] = accepted_params[i * n_parameters + k];
-            summ_params[k * 3] += par_i[i]/n_samples;
+            par_i[i-burnin] = m_all_accepted_params[i * m_n_params + k];
+            summ_params[k * 3] += par_i[i-burnin]/n_samples_dbl;
         }
 
         // Computing the 95% Credible interval
         std::sort(par_i.begin(), par_i.end());
 
         summ_params[k * 3 + 1u] = 
-            par_i[std::floor(.025 * static_cast<epiworld_double>(n_samples))];
+            par_i[std::floor(.025 * n_samples_dbl)];
         summ_params[k * 3 + 2u] = 
-            par_i[std::floor(.975 * static_cast<epiworld_double>(n_samples))];
+            par_i[std::floor(.975 * n_samples_dbl)];
 
     }
 
-    for (size_t k = 0u; k < n_statistics; ++k)
+    // Compute statistics summary values
+    for (size_t k = 0u; k < m_n_stats; ++k)
     {
 
         // Retrieving the relevant parameter
-        std::vector< epiworld_double > stat_k(n_samples);
-        for (size_t i = 0u; i < n_samples; ++i)
+        std::vector< epiworld_double > stat_k(n_samples_print);
+        for (size_t i = burnin; i < m_n_samples; ++i)
         {
-            stat_k[i] = accepted_stats[i * n_statistics + k];
-            summ_stats[k * 3] += stat_k[i]/n_samples;
+            stat_k[i-burnin] = m_all_accepted_stats[i * m_n_stats + k];
+            summ_stats[k * 3] += stat_k[i-burnin]/n_samples_dbl;
         }
 
         // Computing the 95% Credible interval
         std::sort(stat_k.begin(), stat_k.end());
-
         summ_stats[k * 3 + 1u] = 
-            stat_k[std::floor(.025 * static_cast<epiworld_double>(n_samples))];
+            stat_k[std::floor(.025 * n_samples_dbl)];
         summ_stats[k * 3 + 2u] = 
-            stat_k[std::floor(.975 * static_cast<epiworld_double>(n_samples))];
+            stat_k[std::floor(.975 * n_samples_dbl)];
 
     }
 
     printf_epiworld("___________________________________________\n\n");
     printf_epiworld("LIKELIHOOD-FREE MARKOV CHAIN MONTE CARLO\n\n");
 
-    printf_epiworld("N Samples : %ld\n", n_samples);
+    printf_epiworld("N Samples (total) : %zu\n", m_n_samples);
+    printf_epiworld("N Samples (after burn-in period) : %zu\n", m_n_samples - burnin);
 
     std::string abbr;
     epiworld_double elapsed;
-    get_elapsed("auto", &elapsed, &abbr, false);
+    get_elapsed_time("auto", &elapsed, &abbr, false);
     printf_epiworld("Elapsed t : %.2f%s\n\n", elapsed, abbr.c_str());
     
     ////////////////////////////////////////////////////////////////////////////
@@ -78,10 +100,10 @@ inline void LFMCMC<TData>::print()
     nchar_par_num += 5; // 1 for neg padd, 2 for decimals, 1 the decimal point, and one b/c log(<10) < 1.
     std::string charlen = std::to_string(nchar_par_num);
 
-    if (names_parameters.size() != 0u)
+    if (m_param_names.size() != 0u)
     {
         int nchar_par = 0;
-        for (auto & n : names_parameters)
+        for (auto & n : m_param_names)
         {
             int tmp_nchar = n.length();
             if (nchar_par < tmp_nchar)
@@ -96,15 +118,15 @@ inline void LFMCMC<TData>::print()
             std::string(".2f] (initial : % ") +
             charlen + std::string(".2f)\n");
 
-        for (size_t k = 0u; k < n_parameters; ++k)
+        for (size_t k = 0u; k < m_n_params; ++k)
         {
             printf_epiworld(
                 fmt_params.c_str(),
-                names_parameters[k].c_str(),
+                m_param_names[k].c_str(),
                 summ_params[k * 3],
                 summ_params[k * 3 + 1u],
                 summ_params[k * 3 + 2u],
-                params_init[k]
+                m_initial_params[k]
                 );
         }
 
@@ -117,7 +139,7 @@ inline void LFMCMC<TData>::print()
             std::string(".2f] (initial : % ") + charlen +
             std::string(".2f)\n");
 
-        for (size_t k = 0u; k < n_parameters; ++k)
+        for (size_t k = 0u; k < m_n_params; ++k)
         {
             
             printf_epiworld(
@@ -126,7 +148,7 @@ inline void LFMCMC<TData>::print()
                 summ_params[k * 3],
                 summ_params[k * 3 + 1u],
                 summ_params[k * 3 + 2u],
-                params_init[k]
+                m_initial_params[k]
                 );
         }
 
@@ -150,10 +172,10 @@ inline void LFMCMC<TData>::print()
 
     // Figuring out format
     std::string fmt_stats;
-    if (names_statistics.size() != 0u)
+    if (m_stat_names.size() != 0u)
     {
         int nchar_stats = 0;
-        for (auto & n : names_statistics)
+        for (auto & n : m_stat_names)
         {
             int tmp_nchar = n.length();
             if (nchar_stats < tmp_nchar)
@@ -168,15 +190,15 @@ inline void LFMCMC<TData>::print()
             std::string(".2f] (Observed: % ") + nchar_char +
             std::string(".2f)\n");
 
-        for (size_t k = 0u; k < n_statistics; ++k)
+        for (size_t k = 0u; k < m_n_stats; ++k)
         {
             printf_epiworld(
                 fmt_stats.c_str(),
-                names_statistics[k].c_str(),
+                m_stat_names[k].c_str(),
                 summ_stats[k * 3],
                 summ_stats[k * 3 + 1u],
                 summ_stats[k * 3 + 2u],
-                observed_stats[k]
+                m_observed_stats[k]
                 );
         }
 
@@ -190,7 +212,7 @@ inline void LFMCMC<TData>::print()
             std::string(".2f] (Observed: % ") + nchar_char +
             std::string(".2f)\n");
 
-        for (size_t k = 0u; k < n_statistics; ++k)
+        for (size_t k = 0u; k < m_n_stats; ++k)
         {
             printf_epiworld(
                 fmt_stats.c_str(),
@@ -198,7 +220,7 @@ inline void LFMCMC<TData>::print()
                 summ_stats[k * 3],
                 summ_stats[k * 3 + 1u],
                 summ_stats[k * 3 + 2u],
-                observed_stats[k]
+                m_observed_stats[k]
                 );
         }
 

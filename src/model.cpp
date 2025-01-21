@@ -130,6 +130,8 @@ void epiworldpy::export_model(py::class_<epiworld::Model<int>> &c) {
           "Adds a virus to the model", py::arg("virus"))
       .def("add_tool", &Model<int>::add_tool,
            "Adds a tool to modify the model.", py::arg("tool"))
+      .def("add_entity", &Model<int>::add_entity)
+      .def("get_entity", &Model<int>::get_entity)
       .def("agents_smallworld", &Model<int>::agents_smallworld,
            "Populate the model without an edgelist.", py::arg("n"),
            py::arg("k"), py::arg("d"), py::arg("p"))
